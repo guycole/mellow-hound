@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/HoundApp/HoundApp.iml" filepath="$PROJECT_DIR$/HoundApp/HoundApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HoundLib/HoundLib.iml" filepath="$PROJECT_DIR$/HoundLib/HoundLib.iml" />
       <module fileurl="file://$PROJECT_DIR$/mellow-hound-android.iml" filepath="$PROJECT_DIR$/mellow-hound-android.iml" />
     </modules>
   </component>
