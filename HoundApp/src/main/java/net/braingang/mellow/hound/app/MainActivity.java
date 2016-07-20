@@ -26,9 +26,10 @@ public class MainActivity extends Activity {
 
     private static final String[] INITIAL_PERMS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
-    private static final int COARSE_LOCATION_REQUEST = 1234;
-    private static final int FINE_LOCATION_REQUEST = 1234+1;
-    private static final int EXTERNAL_STORAGE_REQUEST = 1234+2;
+    private static final int BASE_REQUEST = 1234;
+    private static final int COARSE_LOCATION_REQUEST = BASE_REQUEST;
+    private static final int FINE_LOCATION_REQUEST = BASE_REQUEST+1;
+    private static final int EXTERNAL_STORAGE_REQUEST = BASE_REQUEST+2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +48,9 @@ public class MainActivity extends Activity {
             requestPermissions(INITIAL_PERMS, EXTERNAL_STORAGE_REQUEST);
         }
 
-        writeTelephony();
+    //    writeTelephony();
+    //    Intent intent = new Intent(this, GeoLocService.class);
+    //    startService(intent);
     }
 
     @Override
@@ -79,7 +82,7 @@ public class MainActivity extends Activity {
 
     private boolean hasPermission(String arg) {
         boolean flag = (PackageManager.PERMISSION_GRANTED == checkSelfPermission(arg));
-        return flag;
+        return true;
     }
 
     private void writeTelephony() {

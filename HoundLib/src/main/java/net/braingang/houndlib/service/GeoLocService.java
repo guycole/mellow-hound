@@ -3,6 +3,7 @@ package net.braingang.houndlib.service;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -87,6 +88,9 @@ public class GeoLocService extends Service {
             }
         };
 
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GEO_MIN_TIME, GEO_MIN_DISTANCE, locationListener1);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, GEO_MIN_TIME, GEO_MIN_DISTANCE, locationListener2);
@@ -105,7 +109,7 @@ public class GeoLocService extends Service {
 
     private void freshLocation(Location location) {
         cueTone();
-        writeTelephony();
+    //    writeTelephony();
     }
 
     private void cueTone() {
@@ -115,6 +119,7 @@ public class GeoLocService extends Service {
     }
 
     private void writeTelephony() {
+        /*
         TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
         System.out.println("operator:" + telephonyManager.getNetworkOperator());
@@ -126,5 +131,6 @@ public class GeoLocService extends Service {
         for (CellInfo cellInfo:cellList) {
             System.out.println(cellInfo);
         }
+        */
     }
 }
