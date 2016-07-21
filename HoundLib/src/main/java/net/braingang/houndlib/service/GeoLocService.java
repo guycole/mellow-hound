@@ -1,136 +1,109 @@
 package net.braingang.houndlib.service;
 
-import android.app.Service;
-import android.content.Context;
+import android.app.IntentService;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.Context;
 import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.telephony.CellInfo;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import java.util.List;
-
-public class GeoLocService extends Service {
+/**
+ *
+ */
+public class GeoLocService extends IntentService {
     public static final String LOG_TAG = GeoLocService.class.getName();
 
     public static final float GEO_MIN_DISTANCE = 1000L;
     public static final long GEO_MIN_TIME = 60 * 1000L;
 
-    private LocationListener locationListener1;
-    private LocationListener locationListener2;
+    private static final String ACTION_START = "net.braingang.houndlib.service.action.START";
+    private static final String ACTION_UPDATE = "net.braingang.houndlib.service.action.UPDATE";
+
+    // TODO: Rename parameters
+    private static final String EXTRA_PARAM1 = "net.braingang.houndlib.service.extra.PARAM1";
+    private static final String EXTRA_PARAM2 = "net.braingang.houndlib.service.extra.PARAM2";
 
     public GeoLocService() {
-        // empty
+        super("GeoLocService");
+    }
+
+    /**
+     * Starts this service to perform action Foo with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     *
+     * @see IntentService
+     */
+    // TODO: Customize helper method
+    public static void startGeoLoc(Context context) {
+        Intent intent = new Intent(context, GeoLocService.class);
+        intent.setAction(ACTION_START);
+        context.startService(intent);
+    }
+
+    /**
+     * Starts this service to perform action Baz with the given parameters. If
+     * the service is already performing a task this action will be queued.
+     *
+     * @see IntentService
+     */
+    // TODO: Customize helper method
+    public static void startActionBaz(Context context, String param1, String param2) {
+        Intent intent = new Intent(context, GeoLocService.class);
+      //  intent.setAction(ACTION_BAZ);
+        intent.putExtra(EXTRA_PARAM1, param1);
+        intent.putExtra(EXTRA_PARAM2, param2);
+        context.startService(intent);
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(LOG_TAG, "xxx xxx OnStartCommand" + startId + " xxx xxx");
-        return START_STICKY;
+    protected void onHandleIntent(Intent intent) {
+        if (intent != null) {
+            final String action = intent.getAction();
+            if (ACTION_START.equals(action)) {
+                handleActionStart();
+            } else if (ACTION_UPDATE.equals(action)) {
+                System.out.println("action update update update");
+               // final String param1 = intent.getStringExtra(EXTRA_PARAM1);
+               // final String param2 = intent.getStringExtra(EXTRA_PARAM2);
+               // handleActionBaz(param1, param2);
+            }
+        }
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Log.d(LOG_TAG, "xxx xxx onCreate xxx xxx ");
+    /**
+     * Handle action Foo in the provided background thread with the provided
+     * parameters.
+     */
+    private void handleActionStart() {
+        Log.i(LOG_TAG, "xoxoxoxoxoxoxoxoxoxoxoxxoxoxoxoxoxo");
+        Log.i(LOG_TAG, "xo start start start start start xo");
+        Log.i(LOG_TAG, "xoxoxoxoxoxoxoxoxoxoxoxxoxoxoxoxoxo");
 
-        locationListener1 = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                Log.i(LOG_TAG, "onLocationChanged1:" + location);
-                freshLocation(location);
-            }
+        System.out.println("action start");
 
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-                Log.i(LOG_TAG, "onStatusChanged1:" + status + ":" + provider);
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-                Log.i(LOG_TAG, "onProviderEnabled1:" + provider);
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-                Log.i(LOG_TAG, "onProviderDisabled1:" + provider);
-            }
-        };
-
-        locationListener2 = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                Log.i(LOG_TAG, "onLocationChanged2:" + location);
-                freshLocation(location);
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-                Log.i(LOG_TAG, "onStatusChanged2:" + provider);
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-                Log.i(LOG_TAG, "onProviderEnabled2:" + provider);
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-                Log.i(LOG_TAG, "onProviderDisabled2:" + provider);
-            }
-        };
+        Intent intent = new Intent(this, GeoLocService.class);
+        intent.setAction(GeoLocService.ACTION_UPDATE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, GEO_MIN_TIME, GEO_MIN_DISTANCE, locationListener1);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, GEO_MIN_TIME, GEO_MIN_DISTANCE, locationListener2);
+        locationManager.requestLocationUpdates(GEO_MIN_TIME, GEO_MIN_DISTANCE, criteria, pendingIntent);
+    }
+
+    /**
+     * Handle action Baz in the provided background thread with the provided
+     * parameters.
+     */
+    private void handleActionUpdate(String param1, String param2) {
+        // TODO: Handle action Baz
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     public void onDestroy() {
         super.onDestroy();
         Log.d(LOG_TAG, "xxx xxx onDestroy xxx xxx");
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    private void freshLocation(Location location) {
-        cueTone();
-    //    writeTelephony();
-    }
-
-    private void cueTone() {
-        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        Ringtone ringtone = RingtoneManager.getRingtone(this, notification);
-        ringtone.play();
-    }
-
-    private void writeTelephony() {
-        /*
-        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-
-        System.out.println("operator:" + telephonyManager.getNetworkOperator());
-        System.out.println("operator:" + telephonyManager.getNetworkOperatorName());
-
-        List<CellInfo> cellList = telephonyManager.getAllCellInfo();
-        System.out.println("cell info:" + cellList.size());
-
-        for (CellInfo cellInfo:cellList) {
-            System.out.println(cellInfo);
-        }
-        */
     }
 }

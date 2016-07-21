@@ -17,11 +17,10 @@ public class HoundApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
         Log.i(LOG_TAG, "xoxoxoxoxoxoxoxoxoxoxoxxoxoxoxoxoxo");
         Log.i(LOG_TAG, "xo start start start start start xo");
         Log.i(LOG_TAG, "xoxoxoxoxoxoxoxoxoxoxoxxoxoxoxoxoxo");
-
-
     }
 
     @Override

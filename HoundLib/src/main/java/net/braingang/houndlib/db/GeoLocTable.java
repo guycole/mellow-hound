@@ -26,12 +26,22 @@ public class GeoLocTable implements DataBaseTable {
             + Columns._ID + " INTEGER PRIMARY KEY,"
             + Columns.TIMESTAMP + " TEXT NOT NULL,"
             + Columns.TIMESTAMP_MS + " INTEGER NOT NULL,"
+            + Columns.ACCURACY + " REAL NOT NULL,"
+            + Columns.ALTITUDE + " REAL NOT NULL,"
+            + Columns.LATITUDE + " REAL NOT NULL,"
+            + Columns.LONGITUDE + " REAL NOT NULL,"
+            + Columns.PROVIDER + " TEXT NOT NULL,"
             + Columns.NOTE + " TEXT NOT NULL"
             + ");";
 
     public static final class Columns implements BaseColumns {
         public static final String TIMESTAMP = "time_stamp";
         public static final String TIMESTAMP_MS = "time_stamp_ms";
+        public static final String ACCURACY = "accuracy";
+        public static final String ALTITUDE = "altitude";
+        public static final String LATITUDE = "latitude";
+        public static final String LONGITUDE = "longitude";
+        public static final String PROVIDER = "provider";
         public static final String NOTE = "note";
     }
 
@@ -40,9 +50,14 @@ public class GeoLocTable implements DataBaseTable {
 
     static {
         PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns._ID, net.braingang.houndlib.db.GeoLocTable.Columns._ID);
+        PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns.ACCURACY, net.braingang.houndlib.db.GeoLocTable.Columns.ACCURACY);
+        PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns.ALTITUDE, net.braingang.houndlib.db.GeoLocTable.Columns.ALTITUDE);
+        PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns.LATITUDE, net.braingang.houndlib.db.GeoLocTable.Columns.LATITUDE);
+        PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns.LONGITUDE, net.braingang.houndlib.db.GeoLocTable.Columns.LONGITUDE);
+        PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns.NOTE, net.braingang.houndlib.db.GeoLocTable.Columns.NOTE);
+        PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns.PROVIDER, net.braingang.houndlib.db.GeoLocTable.Columns.PROVIDER);
         PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns.TIMESTAMP, net.braingang.houndlib.db.GeoLocTable.Columns.TIMESTAMP);
         PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns.TIMESTAMP_MS, net.braingang.houndlib.db.GeoLocTable.Columns.TIMESTAMP_MS);
-        PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns.NOTE, net.braingang.houndlib.db.GeoLocTable.Columns.NOTE);
     }
 
     @Override

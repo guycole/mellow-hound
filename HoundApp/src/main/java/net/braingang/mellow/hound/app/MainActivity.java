@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.telephony.CellInfo;
 import android.telephony.CellInfoCdma;
@@ -14,8 +16,11 @@ import android.telephony.CellInfoWcdma;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import net.braingang.houndlib.service.GeoLocService;
+//import net.braingang.houndlib.service.GeoLocService;
+//import net.braingang.houndlib.service.GeoLocServiceOld;
 
+import net.braingang.houndlib.db.ContentFacade;
+import net.braingang.houndlib.db.GeoLocModel;
 import net.braingang.mellow.hound.R;
 
 import java.util.List;
@@ -36,6 +41,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        providerTest();
+
+        /*
         if (!canAccessCoarseLocation()) {
             requestPermissions(INITIAL_PERMS, COARSE_LOCATION_REQUEST);
         }
@@ -48,18 +56,30 @@ public class MainActivity extends Activity {
             requestPermissions(INITIAL_PERMS, EXTERNAL_STORAGE_REQUEST);
         }
 
+        if (canAccessCoarseLocation() && canAccessFineLocation()) {
+            Log.i(LOG_TAG, "start start start start");
+            GeoLocService2.startGeoLoc(this);
+        } else {
+            Log.i(LOG_TAG, "fail fail fail fail");
+        }
+        */
+
+//        GeoLocService.startGeoLoc(this);
+
     //    writeTelephony();
-    //    Intent intent = new Intent(this, GeoLocService.class);
+    //    Intent intent = new Intent(this, GeoLocServiceOld.class);
     //    startService(intent);
     }
 
+    /*
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         Log.i(LOG_TAG, "onRequestPermissions:" + permissions.length);
 
         if (canAccessCoarseLocation() && canAccessFineLocation()) {
-            Intent intent = new Intent(this, GeoLocService.class);
-            startService(intent);
+            GeoLocService2.startGeoLoc(this);
+          //  Intent intent = new Intent(this, GeoLocServiceOld.class);
+          //  startService(intent);
         }
 
         Log.i(LOG_TAG, "listeners established");
@@ -83,6 +103,20 @@ public class MainActivity extends Activity {
     private boolean hasPermission(String arg) {
         boolean flag = (PackageManager.PERMISSION_GRANTED == checkSelfPermission(arg));
         return true;
+    }
+    */
+
+    private void providerTest() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        //GeoLocModel model = new GeoLocModel();
+        //model.setDefault();
+        //model.fromLocation(location);
+
+        ContentFacade contentFacade = new ContentFacade();
+        //contentFacade.insertGeoLoc(model, this);
+        contentFacade.insertLocation(location, this);
     }
 
     private void writeTelephony() {

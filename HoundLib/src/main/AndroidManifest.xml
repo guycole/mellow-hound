@@ -13,14 +13,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <service
-            android:name=".service.GeoLocService"
+        <provider
+            android:name=".db.DataBaseProvider"
+            android:authorities="net.braingang.houndlib.dbprovider"
             android:enabled="true"
             android:exported="false" />
 
-        <provider
-            android:name=".db.DataBaseProvider"
-            android:authorities="databaseure"
+        <service
+            android:name=".service.GeoLocService"
             android:enabled="true"
             android:exported="false" />
     </application>
