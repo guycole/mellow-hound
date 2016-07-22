@@ -1,5 +1,6 @@
 package net.braingang.houndlib.service;
 
+import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 
 import net.braingang.houndlib.Personality;
@@ -35,8 +37,20 @@ public class GeoLocService extends IntentService {
      * @param context
      */
     public static void startGeoLoc(Context context) {
-        Intent intent = new Intent(context, GeoLocService.class);
-        context.startService(intent);
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+
+        Personality.geoLocPending = PendingIntent.getService(context, REQUEST_CODE, new Intent(context, GeoLocService.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(GEO_MIN_TIME, GEO_MIN_DISTANCE, criteria, Personality.geoLocPending);
+    }
+
+    public static void startGeoLoc(Context context, long period) {
+        Personality.geoLocPending = PendingIntent.getService(context, REQUEST_CODE, new Intent(context, GeoLocService.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), period, Personality.geoLocPending);
     }
 
     @Override
@@ -45,6 +59,9 @@ public class GeoLocService extends IntentService {
         Log.i(LOG_TAG, "handle handle handle");
         Log.i(LOG_TAG, "handle handle handle");
 
+        Personality.counter += 1;
+        Log.i(LOG_TAG, "counter:" + Personality.counter);
+
         Bundle bundle = intent.getExtras();
         if ((bundle != null) && (bundle.containsKey(LocationManager.KEY_LOCATION_CHANGED))) {
             Location location = (Location) bundle.get(LocationManager.KEY_LOCATION_CHANGED);
@@ -52,23 +69,12 @@ public class GeoLocService extends IntentService {
             playAlert();
         }
 
-        if (Personality.flag == false) {
-
-            Criteria criteria = new Criteria();
-            criteria.setAccuracy(Criteria.ACCURACY_FINE);
-
-            PendingIntent pendingIntent = PendingIntent.getService(this, REQUEST_CODE, new Intent(this, GeoLocService.class), PendingIntent.FLAG_UPDATE_CURRENT);
-
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(GEO_MIN_TIME, GEO_MIN_DISTANCE, criteria, pendingIntent);
-
-            Personality.flag = true;
-        } else {
-            Log.i(LOG_TAG, "skipping skipping");
-        }
+        //playAlert();
     }
 
     private void playAlert() {
+        Log.i(LOG_TAG, "playAlert");
+
         try {
             Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), ringtoneUri);

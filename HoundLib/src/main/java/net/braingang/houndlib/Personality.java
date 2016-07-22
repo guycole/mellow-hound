@@ -22,4 +22,9 @@ public class Personality {
      *
      */
     public static Boolean flag = false;
+
+    /**
+     *
+     */
+    public static Integer counter = 0;
 }

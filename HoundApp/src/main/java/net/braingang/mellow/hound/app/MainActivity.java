@@ -57,7 +57,8 @@ public class MainActivity extends AppCompatActivity {
         Log.i(LOG_TAG, "onRequestPermissions:" + requestCode + ":" + permissions.length + ":" + grantResults.length);
 
         if (canAccessCoarseLocation() && canAccessFineLocation()) {
-            GeoLocService.startGeoLoc(this);
+            //GeoLocService.startGeoLoc(this);
+            GeoLocService.startGeoLoc(this, 2000L);
         } else {
             Log.i(LOG_TAG, "unable to start geoloc");
         }
