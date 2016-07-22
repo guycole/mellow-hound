@@ -18,13 +18,19 @@ public class DataBaseProvider extends ContentProvider {
 
     private DataBaseHelper dbHelper;
 
-    private static final int URI_MATCH_GEOLOC = 27;
-    private static final int URI_MATCH_GEOLOC_ID = 28;
+    private static final int URI_MATCH_CELLULAR = 10;
+    private static final int URI_MATCH_CELLULAR_ID = 11;
+
+    private static final int URI_MATCH_GEOLOC = 20;
+    private static final int URI_MATCH_GEOLOC_ID = 21;
 
     private static final UriMatcher URI_MATCHER;
 
     static {
         URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
+
+        URI_MATCHER.addURI(Constant.AUTHORITY, CellularTable.TABLE_NAME, URI_MATCH_CELLULAR);
+        URI_MATCHER.addURI(Constant.AUTHORITY, CellularTable.TABLE_NAME + "/#", URI_MATCH_CELLULAR_ID);
 
         URI_MATCHER.addURI(Constant.AUTHORITY, GeoLocTable.TABLE_NAME, URI_MATCH_GEOLOC);
         URI_MATCHER.addURI(Constant.AUTHORITY, GeoLocTable.TABLE_NAME + "/#", URI_MATCH_GEOLOC_ID);
@@ -42,6 +48,13 @@ public class DataBaseProvider extends ContentProvider {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         switch (URI_MATCHER.match(uri)) {
+            case URI_MATCH_CELLULAR:
+                count = db.delete(CellularTable.TABLE_NAME, selection, selectionArgs);
+                break;
+            case URI_MATCH_CELLULAR_ID:
+                id = uri.getPathSegments().get(1);
+                count = db.delete(CellularTable.TABLE_NAME, CellularTable.Columns._ID + "=" + id + (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
+                break;
             case URI_MATCH_GEOLOC:
                 count = db.delete(GeoLocTable.TABLE_NAME, selection, selectionArgs);
                 break;
@@ -60,6 +73,10 @@ public class DataBaseProvider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
         switch (URI_MATCHER.match(uri)) {
+            case URI_MATCH_CELLULAR:
+                return CellularTable.CONTENT_TYPE;
+            case URI_MATCH_CELLULAR_ID:
+                return CellularTable.CONTENT_ITEM_TYPE;
             case URI_MATCH_GEOLOC:
                 return GeoLocTable.CONTENT_TYPE;
             case URI_MATCH_GEOLOC_ID:
@@ -75,6 +92,14 @@ public class DataBaseProvider extends ContentProvider {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         switch (URI_MATCHER.match(uri)) {
+            case URI_MATCH_CELLULAR:
+                rowId = db.insert(CellularTable.TABLE_NAME, null, values);
+                if (rowId > 0) {
+                    Uri result = ContentUris.withAppendedId(CellularTable.CONTENT_URI, rowId);
+                    getContext().getContentResolver().notifyChange(CellularTable.CONTENT_URI, null);
+                    return result;
+                }
+                break;
             case URI_MATCH_GEOLOC:
                 rowId = db.insert(GeoLocTable.TABLE_NAME, null, values);
                 if (rowId > 0) {
@@ -102,6 +127,21 @@ public class DataBaseProvider extends ContentProvider {
         String orderBy = sortOrder;
 
         switch (URI_MATCHER.match(uri)) {
+            case URI_MATCH_CELLULAR:
+                qb.setTables(CellularTable.TABLE_NAME);
+                qb.setProjectionMap(CellularTable.PROJECTION_MAP);
+                if (sortOrder == null) {
+                    orderBy = CellularTable.DEFAULT_SORT_ORDER;
+                }
+                break;
+            case URI_MATCH_CELLULAR_ID:
+                qb.setTables(CellularTable.TABLE_NAME);
+                qb.setProjectionMap(CellularTable.PROJECTION_MAP);
+                qb.appendWhere(CellularTable.Columns._ID + "=" + uri.getPathSegments().get(1));
+                if (sortOrder == null) {
+                    orderBy = CellularTable.DEFAULT_SORT_ORDER;
+                }
+                break;
             case URI_MATCH_GEOLOC:
                 qb.setTables(GeoLocTable.TABLE_NAME);
                 qb.setProjectionMap(GeoLocTable.PROJECTION_MAP);
@@ -134,6 +174,13 @@ public class DataBaseProvider extends ContentProvider {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         switch (URI_MATCHER.match(uri)) {
+            case URI_MATCH_CELLULAR:
+                count = db.update(CellularTable.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case URI_MATCH_CELLULAR_ID:
+                id = uri.getPathSegments().get(1);
+                count = db.update(CellularTable.TABLE_NAME, values, CellularTable.Columns._ID + "=" + id + (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
+                break;
             case URI_MATCH_GEOLOC:
                 count = db.update(GeoLocTable.TABLE_NAME, values, selection, selectionArgs);
                 break;

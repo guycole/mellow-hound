@@ -11,7 +11,7 @@ import android.content.Context;
  * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
-public class MyIntentService extends IntentService {
+public class MultiService extends IntentService {
     // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
     private static final String ACTION_FOO = "net.braingang.houndlib.service.action.FOO";
@@ -21,8 +21,8 @@ public class MyIntentService extends IntentService {
     private static final String EXTRA_PARAM1 = "net.braingang.houndlib.service.extra.PARAM1";
     private static final String EXTRA_PARAM2 = "net.braingang.houndlib.service.extra.PARAM2";
 
-    public MyIntentService() {
-        super("MyIntentService");
+    public MultiService() {
+        super("MultiService");
     }
 
     /**
@@ -33,7 +33,7 @@ public class MyIntentService extends IntentService {
      */
     // TODO: Customize helper method
     public static void startActionFoo(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, MyIntentService.class);
+        Intent intent = new Intent(context, MultiService.class);
         intent.setAction(ACTION_FOO);
         intent.putExtra(EXTRA_PARAM1, param1);
         intent.putExtra(EXTRA_PARAM2, param2);
@@ -48,7 +48,7 @@ public class MyIntentService extends IntentService {
      */
     // TODO: Customize helper method
     public static void startActionBaz(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, MyIntentService.class);
+        Intent intent = new Intent(context, MultiService.class);
         intent.setAction(ACTION_BAZ);
         intent.putExtra(EXTRA_PARAM1, param1);
         intent.putExtra(EXTRA_PARAM2, param2);

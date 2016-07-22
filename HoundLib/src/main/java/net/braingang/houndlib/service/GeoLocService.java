@@ -13,9 +13,16 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.telephony.CellInfo;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import net.braingang.houndlib.Personality;
+import net.braingang.houndlib.db.CellularModel;
+import net.braingang.houndlib.db.ContentFacade;
+import net.braingang.houndlib.db.GeoLocModel;
+
+import java.util.List;
 
 /**
  *
@@ -27,6 +34,8 @@ public class GeoLocService extends IntentService {
 
     public static final float GEO_MIN_DISTANCE = 1000L;
     public static final long GEO_MIN_TIME = 60 * 1000L;
+
+    private ContentFacade contentFacade = new ContentFacade();
 
     public GeoLocService() {
         super("GeoLocService");
@@ -65,11 +74,60 @@ public class GeoLocService extends IntentService {
         Bundle bundle = intent.getExtras();
         if ((bundle != null) && (bundle.containsKey(LocationManager.KEY_LOCATION_CHANGED))) {
             Location location = (Location) bundle.get(LocationManager.KEY_LOCATION_CHANGED);
-            Log.i(LOG_TAG, "updated location:" + location.getTime());
-            playAlert();
+            GeoLocModel geoLocModel = freshLocation(location);
+            collectCellular(geoLocModel);
+        } else {
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            GeoLocModel geoLocModel = freshLocation(location);
+            if (geoLocModel == null) {
+                Log.i(LOG_TAG, "null geoloc");
+            } else {
+                Log.i(LOG_TAG, "id:" + geoLocModel.getId());
+                collectCellular(geoLocModel);
+            }
+        }
+    }
+
+    private CellularModel saveFreshCellular(GeoLocModel geoLocModel, CellInfo cellInfo) {
+        System.out.println(cellInfo);
+        return contentFacade.insertCellular(geoLocModel, cellInfo, this);
+    }
+
+    private void collectCellular(GeoLocModel geoLocModel) {
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+        System.out.println("operator:" + telephonyManager.getNetworkOperator());
+        System.out.println("operator:" + telephonyManager.getNetworkOperatorName());
+
+        List<CellInfo> cellList = telephonyManager.getAllCellInfo();
+        System.out.println("cell info:" + cellList.size());
+
+        for (CellInfo cellInfo:cellList) {
+            saveFreshCellular(geoLocModel, cellInfo);
+        }
+    }
+
+    private GeoLocModel saveFreshLocation(Location location) {
+        Personality.currentLocation = location;
+        return contentFacade.insertLocation(location, this);
+    }
+
+    private GeoLocModel freshLocation(Location location) {
+        Log.i(LOG_TAG, "fresh location noted:" + location.getProvider() + ":" + location.getTime());
+
+        if (Personality.currentLocation == null) {
+            Log.i(LOG_TAG, "null current");
+            return saveFreshLocation(location);
         }
 
-        //playAlert();
+        if ((Personality.currentLocation.getTime() == location.getTime()) && (Personality.currentLocation.getProvider().equals(location.getProvider()))) {
+            Log.i(LOG_TAG, "current location match");
+            return null;
+        } else {
+            Log.i(LOG_TAG, "current location fail");
+            return saveFreshLocation(location);
+        }
     }
 
     private void playAlert() {

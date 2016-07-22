@@ -31,6 +31,7 @@ public class GeoLocTable implements DataBaseTable {
             + Columns.LATITUDE + " REAL NOT NULL,"
             + Columns.LONGITUDE + " REAL NOT NULL,"
             + Columns.PROVIDER + " TEXT NOT NULL,"
+            + Columns.ACTIVE_FLAG + " INTEGER NOT NULL,"
             + Columns.NOTE + " TEXT NOT NULL"
             + ");";
 
@@ -42,6 +43,7 @@ public class GeoLocTable implements DataBaseTable {
         public static final String LATITUDE = "latitude";
         public static final String LONGITUDE = "longitude";
         public static final String PROVIDER = "provider";
+        public static final String ACTIVE_FLAG = "active_flag";
         public static final String NOTE = "note";
     }
 
@@ -51,6 +53,7 @@ public class GeoLocTable implements DataBaseTable {
     static {
         PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns._ID, net.braingang.houndlib.db.GeoLocTable.Columns._ID);
         PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns.ACCURACY, net.braingang.houndlib.db.GeoLocTable.Columns.ACCURACY);
+        PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns.ACTIVE_FLAG, net.braingang.houndlib.db.GeoLocTable.Columns.ACTIVE_FLAG);
         PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns.ALTITUDE, net.braingang.houndlib.db.GeoLocTable.Columns.ALTITUDE);
         PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns.LATITUDE, net.braingang.houndlib.db.GeoLocTable.Columns.LATITUDE);
         PROJECTION_MAP.put(net.braingang.houndlib.db.GeoLocTable.Columns.LONGITUDE, net.braingang.houndlib.db.GeoLocTable.Columns.LONGITUDE);

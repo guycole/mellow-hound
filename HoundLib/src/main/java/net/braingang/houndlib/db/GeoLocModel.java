@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 
+import net.braingang.houndlib.Constant;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -13,6 +15,7 @@ import java.util.Date;
  */
 public class GeoLocModel implements DataBaseModel {
     private Long id;
+    private Boolean activeFlag;
     private Date timeStamp;
     private String note;
 
@@ -25,6 +28,7 @@ public class GeoLocModel implements DataBaseModel {
     @Override
     public void setDefault() {
         id = 0L;
+        activeFlag = true;
         timeStamp = new Date();
         note = "No Note";
 
@@ -42,6 +46,12 @@ public class GeoLocModel implements DataBaseModel {
         cv.put(GeoLocTable.Columns.TIMESTAMP_MS, timeStamp.getTime());
         cv.put(GeoLocTable.Columns.NOTE, note);
 
+        if (activeFlag) {
+            cv.put(GeoLocTable.Columns.ACTIVE_FLAG, Constant.SQL_TRUE);
+        } else {
+            cv.put(GeoLocTable.Columns.ACTIVE_FLAG, Constant.SQL_FALSE);
+        }
+
         cv.put(GeoLocTable.Columns.ACCURACY, accuracy.toString());
         cv.put(GeoLocTable.Columns.ALTITUDE, altitude.toString());
         cv.put(GeoLocTable.Columns.LATITUDE, latitude.toString());
@@ -54,6 +64,9 @@ public class GeoLocModel implements DataBaseModel {
     @Override
     public void fromCursor(Cursor cursor) {
         id = cursor.getLong(cursor.getColumnIndex(GeoLocTable.Columns._ID));
+
+        setActive(cursor.getInt(cursor.getColumnIndex(GeoLocTable.Columns.ACTIVE_FLAG)));
+
         timeStamp.setTime(cursor.getLong(cursor.getColumnIndex(GeoLocTable.Columns.TIMESTAMP_MS)));
         note = cursor.getString(cursor.getColumnIndex(GeoLocTable.Columns.NOTE));
 
@@ -79,6 +92,20 @@ public class GeoLocModel implements DataBaseModel {
     }
     public void setId(Long arg) {
         id = arg;
+    }
+
+    public boolean isActive() {
+        return activeFlag;
+    }
+    public void setActive(boolean arg) {
+        activeFlag = arg;
+    }
+    public void setActive(int arg) {
+        if (arg == Constant.SQL_TRUE) {
+            activeFlag = true;
+        } else {
+            activeFlag = false;
+        }
     }
 
     public Date getTimeStamp() {

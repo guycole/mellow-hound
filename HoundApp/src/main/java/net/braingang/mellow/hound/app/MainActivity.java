@@ -81,47 +81,4 @@ public class MainActivity extends AppCompatActivity {
         boolean flag = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         return flag;
     }
-
-    /*
-    private void providerTest() {
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-        //GeoLocModel model = new GeoLocModel();
-        //model.setDefault();
-        //model.fromLocation(location);
-
-        ContentFacade contentFacade = new ContentFacade();
-        //contentFacade.insertGeoLoc(model, this);
-        contentFacade.insertLocation(location, this);
-    }
-
-    private void writeTelephony() {
-        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-
-        System.out.println("operator:" + telephonyManager.getNetworkOperator());
-        System.out.println("operator:" + telephonyManager.getNetworkOperatorName());
-
-        List<CellInfo> cellList = telephonyManager.getAllCellInfo();
-        System.out.println("cell info:" + cellList.size());
-
-        for (CellInfo cellInfo:cellList) {
-            System.out.println(cellInfo);
-
-            if (cellInfo instanceof CellInfoCdma) {
-                System.out.println("cdma");
-            } else if (cellInfo instanceof CellInfoGsm) {
-                System.out.println("gsm");
-            } else if (cellInfo instanceof CellInfoLte) {
-                System.out.println("lte");
-            } else if (cellInfo instanceof CellInfoWcdma) {
-                CellInfoWcdma wcdma = (CellInfoWcdma) cellInfo;
-                System.out.println("wcdma");
-                System.out.println("cid:" + wcdma.getCellIdentity());
-            } else {
-                Log.e(LOG_TAG, "Unknown cellInfo type");
-            }
-        }
-    }
-    */
 }
