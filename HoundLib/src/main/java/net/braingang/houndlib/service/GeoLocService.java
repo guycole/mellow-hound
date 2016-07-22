@@ -77,6 +77,7 @@ public class GeoLocService extends IntentService {
             GeoLocModel geoLocModel = freshLocation(location);
             collectCellular(geoLocModel);
         } else {
+            /*
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             GeoLocModel geoLocModel = freshLocation(location);
@@ -86,6 +87,7 @@ public class GeoLocService extends IntentService {
                 Log.i(LOG_TAG, "id:" + geoLocModel.getId());
                 collectCellular(geoLocModel);
             }
+            */
         }
     }
 
