@@ -1,35 +1,24 @@
 package net.braingang.mellow.hound.app;
 
 import android.Manifest;
-import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
+import android.location.Criteria;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.telephony.CellInfo;
-import android.telephony.CellInfoCdma;
-import android.telephony.CellInfoGsm;
-import android.telephony.CellInfoLte;
-import android.telephony.CellInfoWcdma;
-import android.telephony.TelephonyManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-//import net.braingang.houndlib.service.GeoLocService;
-//import net.braingang.houndlib.service.GeoLocServiceOld;
-
-import net.braingang.houndlib.db.ContentFacade;
-import net.braingang.houndlib.db.GeoLocModel;
+import net.braingang.houndlib.service.GeoLocService;
 import net.braingang.mellow.hound.R;
 
-import java.util.List;
 
-
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     public static final String LOG_TAG = MainActivity.class.getName();
-
-    private static final String[] INITIAL_PERMS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
     private static final int BASE_REQUEST = 1234;
     private static final int COARSE_LOCATION_REQUEST = BASE_REQUEST;
@@ -41,71 +30,58 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        providerTest();
-
-        /*
-        if (!canAccessCoarseLocation()) {
-            requestPermissions(INITIAL_PERMS, COARSE_LOCATION_REQUEST);
-        }
-
-        if (!canAccessFineLocation()) {
-            requestPermissions(INITIAL_PERMS, FINE_LOCATION_REQUEST);
-        }
-
-        if (!canAccessExternalStorage()) {
-            requestPermissions(INITIAL_PERMS, EXTERNAL_STORAGE_REQUEST);
-        }
-
-        if (canAccessCoarseLocation() && canAccessFineLocation()) {
-            Log.i(LOG_TAG, "start start start start");
-            GeoLocService2.startGeoLoc(this);
+        if (canAccessCoarseLocation()) {
+            Log.i(LOG_TAG, "coarse already granted");
         } else {
-            Log.i(LOG_TAG, "fail fail fail fail");
+            Log.i(LOG_TAG, "coarse must granted");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, COARSE_LOCATION_REQUEST);
         }
-        */
 
-//        GeoLocService.startGeoLoc(this);
+        if (canAccessFineLocation()) {
+            Log.i(LOG_TAG, "fine already granted");
+        } else {
+            Log.i(LOG_TAG, "fine must granted");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_REQUEST);
+        }
 
-    //    writeTelephony();
-    //    Intent intent = new Intent(this, GeoLocServiceOld.class);
-    //    startService(intent);
+        if (canAccessExternalStorage()) {
+            Log.i(LOG_TAG, "storage already granted");
+        } else {
+            Log.i(LOG_TAG, "storage must granted");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_REQUEST);
+        }
     }
 
-    /*
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        Log.i(LOG_TAG, "onRequestPermissions:" + permissions.length);
+        Log.i(LOG_TAG, "onRequestPermissions:" + requestCode + ":" + permissions.length + ":" + grantResults.length);
 
         if (canAccessCoarseLocation() && canAccessFineLocation()) {
-            GeoLocService2.startGeoLoc(this);
-          //  Intent intent = new Intent(this, GeoLocServiceOld.class);
-          //  startService(intent);
+            GeoLocService.startGeoLoc(this);
+        } else {
+            Log.i(LOG_TAG, "unable to start geoloc");
         }
-
-        Log.i(LOG_TAG, "listeners established");
     }
 
+    public static final float GEO_MIN_DISTANCE = 1000L;
+    public static final long GEO_MIN_TIME = 60 * 1000L;
+
     private boolean canAccessCoarseLocation() {
-        boolean flag = hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION);
+        boolean flag = (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED);
         return flag;
     }
 
     private boolean canAccessFineLocation() {
-        boolean flag = hasPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+        boolean flag = (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
         return flag;
     }
 
     private boolean canAccessExternalStorage() {
-        boolean flag = hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        boolean flag = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         return flag;
     }
 
-    private boolean hasPermission(String arg) {
-        boolean flag = (PackageManager.PERMISSION_GRANTED == checkSelfPermission(arg));
-        return true;
-    }
-    */
-
+    /*
     private void providerTest() {
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -146,4 +122,5 @@ public class MainActivity extends Activity {
             }
         }
     }
+    */
 }
