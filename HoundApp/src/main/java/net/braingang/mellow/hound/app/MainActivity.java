@@ -1,15 +1,12 @@
 package net.braingang.mellow.hound.app;
 
 import android.Manifest;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -17,13 +14,31 @@ import net.braingang.houndlib.service.GeoLocService;
 import net.braingang.mellow.hound.R;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainActivityListener {
     public static final String LOG_TAG = MainActivity.class.getName();
 
     private static final int BASE_REQUEST = 1234;
     private static final int COARSE_LOCATION_REQUEST = BASE_REQUEST;
     private static final int FINE_LOCATION_REQUEST = BASE_REQUEST+1;
     private static final int EXTERNAL_STORAGE_REQUEST = BASE_REQUEST+2;
+
+    private DrawerLayout drawerLayout;
+
+    // MainActivityListener
+    @Override
+    public void fragmentSelect(MainActivityFragmentEnum selected, Bundle args) {
+        String tag = "bogus";
+    }
+
+    // MainActivityListener
+    public void navDrawerOpen(boolean arg) {
+        if (arg) {
+            drawerLayout.openDrawer(GravityCompat.START);
+        } else {
+            drawerLayout.closeDrawer(GravityCompat.END);
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +65,9 @@ public class MainActivity extends AppCompatActivity {
             Log.i(LOG_TAG, "storage must granted");
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_REQUEST);
         }
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.navDrawerLayout);
+        drawerLayout.openDrawer(GravityCompat.START);
     }
 
     @Override
@@ -57,8 +75,8 @@ public class MainActivity extends AppCompatActivity {
         Log.i(LOG_TAG, "onRequestPermissions:" + requestCode + ":" + permissions.length + ":" + grantResults.length);
 
         if (canAccessCoarseLocation() && canAccessFineLocation()) {
-            //GeoLocService.startGeoLoc(this);
-            GeoLocService.startGeoLoc(this, 2000L);
+            GeoLocService.startGeoLoc(this);
+            //GeoLocService.startGeoLoc(this, 2000L);
         } else {
             Log.i(LOG_TAG, "unable to start geoloc");
         }

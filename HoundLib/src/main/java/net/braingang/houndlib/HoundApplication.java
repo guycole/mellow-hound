@@ -1,12 +1,9 @@
 package net.braingang.houndlib;
 
 import android.app.Application;
-import android.content.Context;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
 import android.util.Log;
+
+import net.braingang.houndlib.utility.UserPreferenceHelper;
 
 /**
  *
@@ -21,6 +18,11 @@ public class HoundApplication extends Application {
         Log.i(LOG_TAG, "xoxoxoxoxoxoxoxoxoxoxoxxoxoxoxoxoxo");
         Log.i(LOG_TAG, "xo start start start start start xo");
         Log.i(LOG_TAG, "xoxoxoxoxoxoxoxoxoxoxoxxoxoxoxoxoxo");
+
+        UserPreferenceHelper uph = new UserPreferenceHelper();
+        if (uph.isEmptyPreferences(this)) {
+            uph.writeDefaults(this);
+        }
     }
 
     @Override
