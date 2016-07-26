@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityListe
         }
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,8 +65,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityListe
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_REQUEST);
         }
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.navDrawerLayout);
-        drawerLayout.openDrawer(GravityCompat.START);
+     //   drawerLayout = (DrawerLayout) findViewById(R.id.navDrawerLayout);
+     //   drawerLayout.openDrawer(GravityCompat.START);
     }
 
     @Override
@@ -75,15 +74,12 @@ public class MainActivity extends AppCompatActivity implements MainActivityListe
         Log.i(LOG_TAG, "onRequestPermissions:" + requestCode + ":" + permissions.length + ":" + grantResults.length);
 
         if (canAccessCoarseLocation() && canAccessFineLocation()) {
-            GeoLocService.startGeoLoc(this);
+            GeoLocService.startGeoLoc(this, true);
             //GeoLocService.startGeoLoc(this, 2000L);
         } else {
             Log.i(LOG_TAG, "unable to start geoloc");
         }
     }
-
-    public static final float GEO_MIN_DISTANCE = 1000L;
-    public static final long GEO_MIN_TIME = 60 * 1000L;
 
     private boolean canAccessCoarseLocation() {
         boolean flag = (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED);

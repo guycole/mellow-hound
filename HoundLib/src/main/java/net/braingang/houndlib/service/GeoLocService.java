@@ -1,8 +1,10 @@
 package net.braingang.houndlib.service;
 
-import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.BluetoothLeScanner;
 import android.content.Intent;
 import android.content.Context;
 import android.location.Criteria;
@@ -12,7 +14,6 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.telephony.CellInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -21,6 +22,7 @@ import net.braingang.houndlib.Personality;
 import net.braingang.houndlib.db.CellularModel;
 import net.braingang.houndlib.db.ContentFacade;
 import net.braingang.houndlib.db.GeoLocModel;
+import net.braingang.houndlib.utility.UserPreferenceHelper;
 
 import java.util.List;
 
@@ -36,37 +38,57 @@ public class GeoLocService extends IntentService {
     public static final long GEO_MIN_TIME = 60 * 1000L;
 
     private ContentFacade contentFacade = new ContentFacade();
+    private UserPreferenceHelper userPreferenceHelper = new UserPreferenceHelper();
 
     public GeoLocService() {
         super("GeoLocService");
     }
 
     /**
-     *
+     * start the geoloc service
      * @param context
+     * @param singleFlag true, perform only one collection cycle else run until cancelled
      */
-    public static void startGeoLoc(Context context) {
+    public static void startGeoLoc(Context context, boolean singleFlag) {
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
+
+        if (Personality.geoLocPending != null) {
+            Log.i(LOG_TAG, "overwrite non null pending intent");
+        }
 
         Personality.geoLocPending = PendingIntent.getService(context, REQUEST_CODE, new Intent(context, GeoLocService.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(GEO_MIN_TIME, GEO_MIN_DISTANCE, criteria, Personality.geoLocPending);
+
+        if (singleFlag) {
+            locationManager.requestSingleUpdate(criteria, Personality.geoLocPending);
+        } else {
+            locationManager.requestLocationUpdates(GEO_MIN_TIME, GEO_MIN_DISTANCE, criteria, Personality.geoLocPending);
+        }
     }
 
+    /*
     public static void startGeoLoc(Context context, long period) {
         Personality.geoLocPending = PendingIntent.getService(context, REQUEST_CODE, new Intent(context, GeoLocService.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), period, Personality.geoLocPending);
     }
+    */
+
+    public static void stopGeoLoc(Context context) {
+        if (Personality.geoLocPending == null) {
+            Log.i(LOG_TAG, "unable to stop w/null pending intent");
+        } else {
+            LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            locationManager.removeUpdates(Personality.geoLocPending);
+        }
+    }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.i(LOG_TAG, "handle handle handle");
-        Log.i(LOG_TAG, "handle handle handle");
-        Log.i(LOG_TAG, "handle handle handle");
+        Log.i(LOG_TAG, "onHandleIntent");
 
         Personality.counter += 1;
         Log.i(LOG_TAG, "counter:" + Personality.counter);
@@ -75,9 +97,32 @@ public class GeoLocService extends IntentService {
         if ((bundle != null) && (bundle.containsKey(LocationManager.KEY_LOCATION_CHANGED))) {
             Location location = (Location) bundle.get(LocationManager.KEY_LOCATION_CHANGED);
             GeoLocModel geoLocModel = freshLocation(location);
-            collectCellular(geoLocModel);
+
+
+            if (userPreferenceHelper.isBleCollection(this)) {
+                collectBle(geoLocModel);
+            } else {
+                Log.i(LOG_TAG, "BLE collection disabled");
+            }
+
+            if (userPreferenceHelper.isCellularCollection(this)) {
+                collectCellular(geoLocModel);
+            } else {
+                Log.i(LOG_TAG, "Cellular collection disabled");
+            }
+
+            if (userPreferenceHelper.isWiFiCollection(this)) {
+
+            } else {
+                Log.i(LOG_TAG, "WiFi collection disabled");
+            }
         } else {
-            /*
+            Log.i(LOG_TAG, "skipping intent w/missing location");
+            return;
+        }
+
+        /*
+        } else {
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             GeoLocModel geoLocModel = freshLocation(location);
@@ -87,8 +132,30 @@ public class GeoLocService extends IntentService {
                 Log.i(LOG_TAG, "id:" + geoLocModel.getId());
                 collectCellular(geoLocModel);
             }
-            */
         }
+        */
+    }
+
+    private void collectBle(GeoLocModel geoLocModel) {
+        BluetoothManager manager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothAdapter adapter = manager.getAdapter();
+
+        if (adapter == null) {
+            Log.i(LOG_TAG, "null bluetooth adapter");
+            return;
+        }
+
+        if (adapter.isEnabled()) {
+        } else {
+            Log.i(LOG_TAG, "bluetooth adapter disabled");
+        }
+
+        System.out.println(manager);
+        System.out.println(adapter);
+        System.out.println(adapter.isEnabled());
+
+        BluetoothLeScanner scanner = adapter.getBluetoothLeScanner();
+        System.out.println(scanner);
     }
 
     private CellularModel saveFreshCellular(GeoLocModel geoLocModel, CellInfo cellInfo) {

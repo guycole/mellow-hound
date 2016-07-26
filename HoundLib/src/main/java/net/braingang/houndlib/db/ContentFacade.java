@@ -23,7 +23,7 @@ public class ContentFacade {
         model.setDefault();
         model.fromLocation(location);
         insertGeoLoc(model, context);
-        Log.i(LOG_TAG, "geoloc:" + model.getId());
+        Log.i(LOG_TAG, "insert geoloc:" + model.getId());
         return model;
     }
 
@@ -37,7 +37,7 @@ public class ContentFacade {
         model.setDefault();
         model.fromCellInfo(geoLocModel, cellInfo);
         insertCellular(model, context);
-        Log.i(LOG_TAG, "cellular:" + model.getId());
+        Log.i(LOG_TAG, "insert cellular:" + model.getId());
         return model;
     }
 }

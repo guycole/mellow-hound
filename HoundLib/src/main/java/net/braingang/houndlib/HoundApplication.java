@@ -19,9 +19,11 @@ public class HoundApplication extends Application {
         Log.i(LOG_TAG, "xo start start start start start xo");
         Log.i(LOG_TAG, "xoxoxoxoxoxoxoxoxoxoxoxxoxoxoxoxoxo");
 
-        UserPreferenceHelper uph = new UserPreferenceHelper();
-        if (uph.isEmptyPreferences(this)) {
-            uph.writeDefaults(this);
+        UserPreferenceHelper userPreferenceHelper = new UserPreferenceHelper();
+        if (userPreferenceHelper.isEmptyPreferences(this)) {
+            userPreferenceHelper.writeDefaults(this);
+            userPreferenceHelper.setBleCollection(this, true);
+            userPreferenceHelper.setCellularCollection(this, true);
         }
     }
 

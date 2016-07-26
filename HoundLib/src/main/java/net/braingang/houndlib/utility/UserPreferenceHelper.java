@@ -5,27 +5,17 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * SharedPreference wrapper.
  */
 public class UserPreferenceHelper {
-    public static final String CHROME_CAST = "chromeCast";
-    public static final String DISPLAY_TRANSITION_AUDIO_CUE = "displayTransitionCue";
+    public static final String BLE_COLLECTION = "bleCollection";
+    public static final String CELLULAR_COLLECTION = "cellularCollection";
+    public static final String WIFI_COLLECTION = "wifiCollection";
 
-    public static final String GOOGLE_ANALYTICS = "googleAnalytics";
-    public static final String LEARNED_NAV_DRAWER = "learnedNavDrawer";
-    public static final String PERSONA = "persona";
-    public static final String USER = "user";
-    public static final String INVENTORY_TAB_SELECTION = "inventoryTabSelection";
-    public static final String FIRST_TIME_USE = "firstTimeUse";
-
-    public static final Long NO_CURRENT_USER = -1L;
-    public static final Long NO_TAB_SELECTION = -1L;
-
-    // set from the Diagnostics Activity
-    public static final String TEST_USER_LAT = "testUserLat";
-    public static final String TEST_USER_LNG = "testUserLng";
+    public static final String INSTALLATION_UUID = "installationUuid";
 
     /**
      * @param context
@@ -34,18 +24,7 @@ public class UserPreferenceHelper {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = sp.edit();
 
-        editor.putBoolean(CHROME_CAST, false);
-        editor.putBoolean(DISPLAY_TRANSITION_AUDIO_CUE, true);
-        editor.putBoolean(GOOGLE_ANALYTICS, true);
-        editor.putBoolean(LEARNED_NAV_DRAWER, false);
-
-        editor.putLong(USER, NO_CURRENT_USER);
-        editor.putLong(INVENTORY_TAB_SELECTION, NO_TAB_SELECTION);
-
-        editor.putFloat(TEST_USER_LAT, 0);
-        editor.putFloat(TEST_USER_LNG, 0);
-
-        editor.putBoolean(FIRST_TIME_USE, true);
+        editor.putString(INSTALLATION_UUID, UUID.randomUUID().toString());
 
         editor.commit();
     }
@@ -63,167 +42,85 @@ public class UserPreferenceHelper {
     }
 
     /**
-     * determine if chromecast video enabled
+     * determine if bluetooth low energy (BLE) collection is enabled
      *
      * @param context
-     * @return true, chromecast video is enabled
+     * @return true, bluetooth low energy (BLE) collection is enabled
      */
-    public boolean isChromeCast(Context context) {
+    public boolean isBleCollection(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getBoolean(CHROME_CAST, false);
+        return sp.getBoolean(BLE_COLLECTION, false);
     }
 
     /**
-     * enable/disable chromecast video
+     * enable/disable bluetooth low energy (BLE) collection
      *
      * @param context
-     * @param flag true, chromecast video is enabled
+     * @param flag true, bluetooth low energy (BLE) collection is enabled
      */
-    public void setChromeCast(Context context, boolean flag) {
-        setBoolean(context, CHROME_CAST, flag);
+    public void setBleCollection(Context context, boolean flag) {
+        setBoolean(context, BLE_COLLECTION, flag);
     }
 
     /**
-     * determine if display transition audio cues are enabled
+     * determine if cellular collection is enabled
      *
      * @param context
-     * @return true, display transition audio cue is enabled
+     * @return true, cellular collection is enabled
      */
-    public boolean isDisplayTransitionAudioCue(Context context) {
+    public boolean isCellularCollection(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getBoolean(DISPLAY_TRANSITION_AUDIO_CUE, true);
+        return sp.getBoolean(CELLULAR_COLLECTION, false);
     }
 
     /**
-     * enable/disable display transition audio cues
+     * enable/disable cellular collection
      *
      * @param context
-     * @param flag true, display transition audio cue is enabled
+     * @param flag true, cellular collection is enabled
      */
-    public void setDisplayTransitionAudioCue(Context context, boolean flag) {
-        setBoolean(context, DISPLAY_TRANSITION_AUDIO_CUE, flag);
+    public void setCellularCollection(Context context, boolean flag) {
+        setBoolean(context, CELLULAR_COLLECTION, flag);
     }
 
     /**
-     * return current user
+     * determine if wifi collection is enabled
      *
      * @param context
-     * @return row id in Person table of current user
+     * @return true, wifi collection is enabled
      */
-    public long getCurrentUser(Context context) {
+    public boolean isWiFiCollection(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getLong(USER, NO_CURRENT_USER);
+        return sp.getBoolean(WIFI_COLLECTION, false);
     }
 
     /**
-     * define current user
+     * enable/disable wifi collection
      *
      * @param context
-     * @param arg     row id in Person table of current user
+     * @param flag true, wifi collection is enabled
      */
-    public void setCurrentUser(Context context, long arg) {
-        setLong(context, USER, arg);
+    public void setWiFiCollection(Context context, boolean flag) {
+        setBoolean(context, WIFI_COLLECTION, flag);
     }
 
     /**
-     * determine if google analytics enabled
-     *
+     * return installation identifier
      * @param context
-     * @return true, google analytics is enabled
+     * @return installation identifier
      */
-    public boolean isGoogleAnalytics(Context context) {
+    public UUID getInstallationUuid(Context context) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getBoolean(GOOGLE_ANALYTICS, false);
+        return UUID.fromString(sp.getString(INSTALLATION_UUID, "8D1C6FA5-0FE6-4E81-BCE0-4AABCD74E267"));
     }
 
     /**
-     * enable/disable google analytics
-     *
+     * define installation uuid
      * @param context
-     * @param flag    true, google analytics is enabled
+     * @param uuid installation uuid
      */
-    public void setGoogleAnalytics(Context context, boolean flag) {
-        setBoolean(context, GOOGLE_ANALYTICS, flag);
-    }
-
-    /**
-     * determine if display transition audio cues are enabled
-     *
-     * @param context
-     * @return true, display transition audio cue is enabled
-     */
-    public boolean isLearnedNavDrawer(Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getBoolean(LEARNED_NAV_DRAWER, false);
-    }
-
-    /**
-     * enable/disable display transition audio cues
-     *
-     * @param context
-     * @param flag    true, display transition audio cue is enabled
-     */
-    public void setLearnedNavDrawer(Context context, boolean flag) {
-        setBoolean(context, LEARNED_NAV_DRAWER, flag);
-    }
-
-    /**
-     *
-     * @param context
-     * @return
-     */
-    public Boolean isFirstTimeUse(Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getBoolean(FIRST_TIME_USE, false);
-    }
-
-    /**
-     *
-     * @param context
-     * @param flag
-     */
-    public void setFirstTimeUse(Context context, boolean flag) {
-        setBoolean(context, FIRST_TIME_USE, flag);
-    }
-
-    /**
-     * @param context
-     * @param inventoryTabSelection
-     */
-    public void setInventoryTabSelection(Context context, Long inventoryTabSelection) {
-        setLong(context, INVENTORY_TAB_SELECTION, inventoryTabSelection);
-    }
-
-    /**
-     * @param context
-     * @return
-     */
-    public Long getInventoryTabSelection(Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getLong(INVENTORY_TAB_SELECTION, NO_TAB_SELECTION);
-    }
-
-    /**
-     *
-     * @param context
-     * @return
-     */
-    public float getTestUserLatitude(Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getFloat(TEST_USER_LAT, 0);
-    }
-
-    public void setTestUserLatitude(Context context, Float testUserLatitude) {
-        setFloat(context, TEST_USER_LAT, testUserLatitude);
-    }
-
-    public float getTestUserLongitude(Context context) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-        return sp.getFloat(TEST_USER_LNG, 0);
-    }
-
-    public void setTestUserLongitude(Context context, Float testUserLongitude) {
-        setFloat(context, TEST_USER_LNG, testUserLongitude);
+    public void setInstallationUuid(Context context, UUID uuid) {
+        setString(context, INSTALLATION_UUID, uuid.toString());
     }
 
     /**
