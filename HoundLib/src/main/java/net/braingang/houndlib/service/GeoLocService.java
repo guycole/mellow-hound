@@ -3,8 +3,8 @@ package net.braingang.houndlib.service;
 import android.app.IntentService;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.le.BluetoothLeScanner;
 import android.content.Intent;
 import android.content.Context;
 import android.location.Criteria;
@@ -14,20 +14,20 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.telephony.CellInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import net.braingang.houndlib.Personality;
-import net.braingang.houndlib.db.CellularModel;
-import net.braingang.houndlib.db.ContentFacade;
-import net.braingang.houndlib.db.GeoLocModel;
+import net.braingang.houndlib.model.FileFacade;
+import net.braingang.houndlib.model.Observation;
 import net.braingang.houndlib.utility.UserPreferenceHelper;
 
 import java.util.List;
 
 /**
- *
+ * Write observation for each location update;
  */
 public class GeoLocService extends IntentService {
     public static final String LOG_TAG = GeoLocService.class.getName();
@@ -37,7 +37,13 @@ public class GeoLocService extends IntentService {
     public static final float GEO_MIN_DISTANCE = 1000L;
     public static final long GEO_MIN_TIME = 60 * 1000L;
 
-    private ContentFacade contentFacade = new ContentFacade();
+    public static final long BLE_SCAN_DURATION = 3333L;
+
+    private Boolean bleScanComplete = false;
+    private Handler bleScanHandler = new Handler();
+
+    private FileFacade fileFacade = new FileFacade();
+    private Observation observation = new Observation();
     private UserPreferenceHelper userPreferenceHelper = new UserPreferenceHelper();
 
     public GeoLocService() {
@@ -96,106 +102,109 @@ public class GeoLocService extends IntentService {
         Bundle bundle = intent.getExtras();
         if ((bundle != null) && (bundle.containsKey(LocationManager.KEY_LOCATION_CHANGED))) {
             Location location = (Location) bundle.get(LocationManager.KEY_LOCATION_CHANGED);
-            GeoLocModel geoLocModel = freshLocation(location);
-
+            freshLocation(location);
 
             if (userPreferenceHelper.isBleCollection(this)) {
-                collectBle(geoLocModel);
+                collectBle();
             } else {
                 Log.i(LOG_TAG, "BLE collection disabled");
             }
 
             if (userPreferenceHelper.isCellularCollection(this)) {
-                collectCellular(geoLocModel);
+                collectCellular();
             } else {
                 Log.i(LOG_TAG, "Cellular collection disabled");
             }
 
             if (userPreferenceHelper.isWiFiCollection(this)) {
-
+                collectWiFi();
             } else {
                 Log.i(LOG_TAG, "WiFi collection disabled");
             }
+
+            while (!bleScanComplete) {
+                try {
+                    Thread.sleep(500L);
+                } catch(Exception exception) {
+                    exception.printStackTrace();
+                }
+            }
+
+            fileFacade.writeObservation(observation, this);
         } else {
             Log.i(LOG_TAG, "skipping intent w/missing location");
             return;
         }
-
-        /*
-        } else {
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            GeoLocModel geoLocModel = freshLocation(location);
-            if (geoLocModel == null) {
-                Log.i(LOG_TAG, "null geoloc");
-            } else {
-                Log.i(LOG_TAG, "id:" + geoLocModel.getId());
-                collectCellular(geoLocModel);
-            }
-        }
-        */
     }
 
-    private void collectBle(GeoLocModel geoLocModel) {
-        BluetoothManager manager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        BluetoothAdapter adapter = manager.getAdapter();
+    private BluetoothAdapter.LeScanCallback bleScanCallback = new BluetoothAdapter.LeScanCallback() {
+        @Override
+        public void onLeScan(final BluetoothDevice device, final int rssi, byte[] scanRecord) {
+            observation.addBleObservation(device, rssi, scanRecord);
+        }
+    };
 
-        if (adapter == null) {
+    private void collectBle() {
+        BluetoothManager manager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        final BluetoothAdapter btAdapter = manager.getAdapter();
+
+        if (btAdapter == null) {
             Log.i(LOG_TAG, "null bluetooth adapter");
             return;
         }
 
-        if (adapter.isEnabled()) {
+        if (btAdapter.isEnabled()) {
+            btAdapter.startLeScan(bleScanCallback);
+
+            bleScanHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (btAdapter != null) {
+                        btAdapter.stopLeScan(bleScanCallback);
+                    }
+
+                    bleScanComplete = true;
+                }
+            }, BLE_SCAN_DURATION);
         } else {
             Log.i(LOG_TAG, "bluetooth adapter disabled");
         }
-
-        System.out.println(manager);
-        System.out.println(adapter);
-        System.out.println(adapter.isEnabled());
-
-        BluetoothLeScanner scanner = adapter.getBluetoothLeScanner();
-        System.out.println(scanner);
     }
 
-    private CellularModel saveFreshCellular(GeoLocModel geoLocModel, CellInfo cellInfo) {
-        System.out.println(cellInfo);
-        return contentFacade.insertCellular(geoLocModel, cellInfo, this);
-    }
-
-    private void collectCellular(GeoLocModel geoLocModel) {
+    private void collectCellular() {
         TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
-        System.out.println("operator:" + telephonyManager.getNetworkOperator());
-        System.out.println("operator:" + telephonyManager.getNetworkOperatorName());
+        String operator = telephonyManager.getNetworkOperator();
+        String opName = telephonyManager.getNetworkOperatorName();
 
         List<CellInfo> cellList = telephonyManager.getAllCellInfo();
-        System.out.println("cell info:" + cellList.size());
 
-        for (CellInfo cellInfo:cellList) {
-            saveFreshCellular(geoLocModel, cellInfo);
-        }
+        observation.addCellular(operator, opName, cellList);
     }
 
-    private GeoLocModel saveFreshLocation(Location location) {
+    private void collectWiFi() {
+        observation.addWiFi();
+        Personality.wifiScanList.clear();
+    }
+
+    private void saveFreshLocation(Location location) {
         Personality.currentLocation = location;
-        return contentFacade.insertLocation(location, this);
+        observation.setLocation(location);
     }
 
-    private GeoLocModel freshLocation(Location location) {
+    private void freshLocation(Location location) {
         Log.i(LOG_TAG, "fresh location noted:" + location.getProvider() + ":" + location.getTime());
 
         if (Personality.currentLocation == null) {
             Log.i(LOG_TAG, "null current");
-            return saveFreshLocation(location);
+            saveFreshLocation(location);
         }
 
         if ((Personality.currentLocation.getTime() == location.getTime()) && (Personality.currentLocation.getProvider().equals(location.getProvider()))) {
             Log.i(LOG_TAG, "current location match");
-            return null;
         } else {
             Log.i(LOG_TAG, "current location fail");
-            return saveFreshLocation(location);
+            saveFreshLocation(location);
         }
     }
 

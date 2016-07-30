@@ -1,9 +1,14 @@
 package net.braingang.houndlib;
 
 import android.app.Application;
+import android.content.Context;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import net.braingang.houndlib.utility.UserPreferenceHelper;
+
+import java.util.ArrayList;
 
 /**
  *
@@ -19,11 +24,21 @@ public class HoundApplication extends Application {
         Log.i(LOG_TAG, "xo start start start start start xo");
         Log.i(LOG_TAG, "xoxoxoxoxoxoxoxoxoxoxoxxoxoxoxoxoxo");
 
+        Personality.wifiScanList = new ArrayList<ScanResult>();
+        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        if (!wifiManager.isWifiEnabled()) {
+            Log.i(LOG_TAG, "wifi disabled");
+        } else {
+            wifiManager.setWifiEnabled(true);
+            wifiManager.startScan();
+        }
+
         UserPreferenceHelper userPreferenceHelper = new UserPreferenceHelper();
         if (userPreferenceHelper.isEmptyPreferences(this)) {
             userPreferenceHelper.writeDefaults(this);
             userPreferenceHelper.setBleCollection(this, true);
             userPreferenceHelper.setCellularCollection(this, true);
+            userPreferenceHelper.setWiFiCollection(this, true);
         }
     }
 

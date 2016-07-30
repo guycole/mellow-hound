@@ -2,6 +2,9 @@ package net.braingang.houndlib;
 
 import android.app.PendingIntent;
 import android.location.Location;
+import android.net.wifi.ScanResult;
+
+import java.util.ArrayList;
 
 /**
  *
@@ -21,7 +24,7 @@ public class Personality {
     /**
      *
      */
-    public static Boolean flag = false;
+    public static ArrayList<ScanResult> wifiScanList;
 
     /**
      *
