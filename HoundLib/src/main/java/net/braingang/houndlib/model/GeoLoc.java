@@ -1,14 +1,15 @@
 package net.braingang.houndlib.model;
 
 import android.location.Location;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
  *
  */
-public class GeoLoc implements Serializable {
+public class GeoLoc {
     private Date timeStamp;
 
     private Float accuracy;
@@ -26,8 +27,16 @@ public class GeoLoc implements Serializable {
         timeStamp = new Date(location.getTime());
     }
 
-    public String toJson() {
-        //FIXME
-        return "fixme";
+    public JSONObject toJson() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("fixTime", timeStamp);
+        jsonObject.put("accuracy", accuracy);
+        jsonObject.put("altitude", altitude);
+        jsonObject.put("latitude", latitude);
+        jsonObject.put("longitude", longitude);
+        jsonObject.put("provider", provider);
+
+        return jsonObject;
     }
 }

@@ -3,8 +3,9 @@ package net.braingang.houndlib.model;
 import android.content.Context;
 import android.util.Log;
 
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.util.UUID;
 
 /**
@@ -18,21 +19,24 @@ public class FileFacade {
         String fullName = context.getExternalFilesDir(null).getAbsolutePath() + "/" + fileName;
         Log.i(LOG_TAG, "write:" + fullName);
 
-        FileOutputStream fos = null;
-        ObjectOutputStream oos = null;
+        BufferedWriter bw = null;
 
         try {
-            fos = new FileOutputStream(fullName);
-            oos = new ObjectOutputStream(fos);
-            oos.writeObject(observation);
+            bw = new BufferedWriter(new FileWriter(fullName));
+            bw.write(observation.toJson(context).toString());
         } catch(Exception exception) {
             exception.printStackTrace();
         } finally {
             try {
-                oos.close();
+                bw.close();
             } catch(Exception exception) {
                 // empty
             }
         }
+    }
+
+    public File[] getOutboundObservation(Context context) {
+        File root = new File(context.getExternalFilesDir(null).getAbsolutePath());
+        return root.listFiles();
     }
 }

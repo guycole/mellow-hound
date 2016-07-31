@@ -6,6 +6,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
+import net.braingang.houndlib.service.OutboundService;
 import net.braingang.houndlib.utility.UserPreferenceHelper;
 
 import java.util.ArrayList;
@@ -40,6 +41,8 @@ public class HoundApplication extends Application {
             userPreferenceHelper.setCellularCollection(this, true);
             userPreferenceHelper.setWiFiCollection(this, true);
         }
+
+        OutboundService.startOutbound(this, Constant.ONE_HOUR);
     }
 
     @Override

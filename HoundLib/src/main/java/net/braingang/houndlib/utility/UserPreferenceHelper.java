@@ -17,6 +17,9 @@ public class UserPreferenceHelper {
 
     public static final String INSTALLATION_UUID = "installationUuid";
 
+    public static final String NETWORK_NAME = "networkName";
+    public static final String NETWORK_OPERATOR = "networkOperator";
+
     /**
      * @param context
      */
@@ -121,6 +124,44 @@ public class UserPreferenceHelper {
      */
     public void setInstallationUuid(Context context, UUID uuid) {
         setString(context, INSTALLATION_UUID, uuid.toString());
+    }
+
+    /**
+     * return network name
+     * @param context
+     * @return network name
+     */
+    public String getNetworkName(Context context) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getString(NETWORK_NAME, "unknown");
+    }
+
+    /**
+     * define network name
+     * @param context
+     * @param arg network name
+     */
+    public void setNetworkName(Context context, String arg) {
+        setString(context, NETWORK_NAME, arg);
+    }
+
+    /**
+     * return network operator
+     * @param context
+     * @return network operator
+     */
+    public String getNetworkOperator(Context context) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getString(NETWORK_OPERATOR, "unknown");
+    }
+
+    /**
+     * define network operator
+     * @param context
+     * @param arg network operator
+     */
+    public void setNetworkOperator(Context context, String arg) {
+        setString(context, NETWORK_OPERATOR, arg);
     }
 
     /**

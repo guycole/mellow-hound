@@ -6,12 +6,13 @@ import android.telephony.CellInfoGsm;
 import android.telephony.CellInfoLte;
 import android.telephony.CellInfoWcdma;
 
-import java.io.Serializable;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  *
  */
-public class Cellular implements Serializable {
+public class Cellular {
 
     private String cellType = "unknown";
 
@@ -44,16 +45,12 @@ public class Cellular implements Serializable {
 
     public Cellular(CellInfo cellInfo) {
         if (cellInfo instanceof CellInfoCdma) {
-            System.out.println("cdma");
             parseCdma((CellInfoCdma) cellInfo);
         } else if (cellInfo instanceof CellInfoGsm) {
-            System.out.println("gsm");
             parseGsm((CellInfoGsm) cellInfo);
         } else if (cellInfo instanceof CellInfoLte) {
-            System.out.println("lte");
             parseLte((CellInfoLte) cellInfo);
         } else if (cellInfo instanceof CellInfoWcdma) {
-            System.out.println("wcdma");
             parseWcdma((CellInfoWcdma) cellInfo);
         }
     }
@@ -122,5 +119,40 @@ public class Cellular implements Serializable {
         networkCode = arg.getCellIdentity().getMnc();
         //      rfChannel = arg.getCellIdentity();
         scrambleCode = arg.getCellIdentity().getPsc();
+    }
+
+    public JSONObject toJson() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("cellType", cellType);
+        jsonObject.put("asuLevel", asuLevel);
+        jsonObject.put("cdmaDbm", cdmaDbm);
+        jsonObject.put("cdmaEcio", cdmaEcio);
+        jsonObject.put("cdmaLevel", cdmaLevel);
+
+        jsonObject.put("dbm", dbm);
+        jsonObject.put("evdoDbm", evdoDbm);
+        jsonObject.put("evdoEcio", evdoEcio);
+        jsonObject.put("evdoLevel", evdoLevel);
+        jsonObject.put("evdoSnr", evdoSnr);
+
+        jsonObject.put("signalLevel", signalLevel);
+        jsonObject.put("timeAdvance", timeAdvance);
+
+        jsonObject.put("cellId", cellId);
+        jsonObject.put("countryCode", countryCode);
+        jsonObject.put("latitude", latitude);
+        jsonObject.put("longitude", longitude);
+        jsonObject.put("locationCode", locationCode);
+        jsonObject.put("networkCode", networkCode);
+
+        jsonObject.put("physicalCellId", cellId);
+        jsonObject.put("rfChannel", rfChannel);
+        jsonObject.put("scrambleCode", scrambleCode);
+        jsonObject.put("stationId", stationId);
+        jsonObject.put("trackCode", trackCode);
+        jsonObject.put("systemCode", systemCode);
+
+        return jsonObject;
     }
 }

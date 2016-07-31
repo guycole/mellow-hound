@@ -19,6 +19,7 @@ import android.telephony.CellInfo;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import net.braingang.houndlib.Constant;
 import net.braingang.houndlib.Personality;
 import net.braingang.houndlib.model.FileFacade;
 import net.braingang.houndlib.model.Observation;
@@ -63,7 +64,8 @@ public class GeoLocService extends IntentService {
             Log.i(LOG_TAG, "overwrite non null pending intent");
         }
 
-        Personality.geoLocPending = PendingIntent.getService(context, REQUEST_CODE, new Intent(context, GeoLocService.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intent = new Intent(context, GeoLocService.class);
+        Personality.geoLocPending = PendingIntent.getService(context, REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
@@ -73,15 +75,6 @@ public class GeoLocService extends IntentService {
             locationManager.requestLocationUpdates(GEO_MIN_TIME, GEO_MIN_DISTANCE, criteria, Personality.geoLocPending);
         }
     }
-
-    /*
-    public static void startGeoLoc(Context context, long period) {
-        Personality.geoLocPending = PendingIntent.getService(context, REQUEST_CODE, new Intent(context, GeoLocService.class), PendingIntent.FLAG_UPDATE_CURRENT);
-
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), period, Personality.geoLocPending);
-    }
-    */
 
     public static void stopGeoLoc(Context context) {
         if (Personality.geoLocPending == null) {
@@ -124,7 +117,7 @@ public class GeoLocService extends IntentService {
 
             while (!bleScanComplete) {
                 try {
-                    Thread.sleep(500L);
+                    Thread.sleep(Constant.THIRTY_SECOND);
                 } catch(Exception exception) {
                     exception.printStackTrace();
                 }
@@ -175,16 +168,22 @@ public class GeoLocService extends IntentService {
         TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
         String operator = telephonyManager.getNetworkOperator();
+        if ((operator != null) && (!operator.isEmpty())) {
+            userPreferenceHelper.setNetworkOperator(this, operator);
+        }
+
         String opName = telephonyManager.getNetworkOperatorName();
+        if ((opName != null) && (!opName.isEmpty())) {
+            userPreferenceHelper.setNetworkName(this, opName);
+        }
 
         List<CellInfo> cellList = telephonyManager.getAllCellInfo();
 
-        observation.addCellular(operator, opName, cellList);
+        observation.addCellular(cellList);
     }
 
     private void collectWiFi() {
         observation.addWiFi();
-        Personality.wifiScanList.clear();
     }
 
     private void saveFreshLocation(Location location) {

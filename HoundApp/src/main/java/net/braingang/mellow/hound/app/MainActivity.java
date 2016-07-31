@@ -74,8 +74,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityListe
         Log.i(LOG_TAG, "onRequestPermissions:" + requestCode + ":" + permissions.length + ":" + grantResults.length);
 
         if (canAccessCoarseLocation() && canAccessFineLocation()) {
-            GeoLocService.startGeoLoc(this, true);
-            //GeoLocService.startGeoLoc(this, 2000L);
+            GeoLocService.startGeoLoc(this, false);
         } else {
             Log.i(LOG_TAG, "unable to start geoloc");
         }

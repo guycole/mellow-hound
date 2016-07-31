@@ -258,16 +258,12 @@ public class CellularModel implements DataBaseModel {
         geoLocId = geoLocModel.getId();
 
         if (cellInfo instanceof CellInfoCdma) {
-            System.out.println("cdma");
             parseCdma((CellInfoCdma) cellInfo);
         } else if (cellInfo instanceof CellInfoGsm) {
-            System.out.println("gsm");
             parseGsm((CellInfoGsm) cellInfo);
         } else if (cellInfo instanceof CellInfoLte) {
-            System.out.println("lte");
             parseLte((CellInfoLte) cellInfo);
         } else if (cellInfo instanceof CellInfoWcdma) {
-            System.out.println("wcdma");
             parseWcdma((CellInfoWcdma) cellInfo);
         }
     }

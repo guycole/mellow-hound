@@ -1,13 +1,13 @@
 package net.braingang.houndlib.model;
 
 import android.net.wifi.ScanResult;
-
-import java.io.Serializable;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  *
  */
-public class WiFi implements Serializable {
+public class WiFi {
     private String ssid;
     private String bssid;
     private String capabilities;
@@ -25,5 +25,19 @@ public class WiFi implements Serializable {
         frequency = arg.frequency;
         level = arg.level;
         timeStamp = arg.timestamp;
+    }
+
+    public JSONObject toJson() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("ssid", ssid);
+        jsonObject.put("bssid", bssid);
+
+        jsonObject.put("capability", capabilities);
+
+        jsonObject.put("frequency", frequency);
+        jsonObject.put("level", level);
+
+        return jsonObject;
     }
 }
