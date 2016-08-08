@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Hourly start from AlarmManager
+ */
 public class OutboundService extends Service {
     public static final String LOG_TAG = OutboundService.class.getName();
 
@@ -65,7 +68,7 @@ public class OutboundService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
+        // not used by local service
         throw new UnsupportedOperationException("Not yet implemented");
     }
 

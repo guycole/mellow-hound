@@ -9,8 +9,11 @@ public class Constant {
     public static final Integer SQL_TRUE = 1;
     public static final Integer SQL_FALSE = 0;
 
+    public static final Long ONE_KILOMETER = 1000L;
+
+    public static final Long QUARTER_SECOND = 250L;
     public static final Long THIRTY_SECOND = 30 * 1000L;
-    public static final Long ONE_MINUTE = 1 * 60 * 1000L;
+    public static final Long ONE_MINUTE = 60 * 1000L;
     public static final Long TEN_MINUTE = ONE_MINUTE * 10;
     public static final Long ONE_HOUR = ONE_MINUTE * 60;
 

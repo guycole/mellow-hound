@@ -24,6 +24,9 @@ public class DataBaseProvider extends ContentProvider {
     private static final int URI_MATCH_GEOLOC = 20;
     private static final int URI_MATCH_GEOLOC_ID = 21;
 
+    private static final int URI_MATCH_OBSERVATION = 30;
+    private static final int URI_MATCH_OBSERVATION_ID = 31;
+
     private static final UriMatcher URI_MATCHER;
 
     static {
@@ -34,6 +37,9 @@ public class DataBaseProvider extends ContentProvider {
 
         URI_MATCHER.addURI(Constant.AUTHORITY, GeoLocTable.TABLE_NAME, URI_MATCH_GEOLOC);
         URI_MATCHER.addURI(Constant.AUTHORITY, GeoLocTable.TABLE_NAME + "/#", URI_MATCH_GEOLOC_ID);
+
+        URI_MATCHER.addURI(Constant.AUTHORITY, ObservationTable.TABLE_NAME, URI_MATCH_OBSERVATION);
+        URI_MATCHER.addURI(Constant.AUTHORITY, ObservationTable.TABLE_NAME + "/#", URI_MATCH_OBSERVATION_ID);
     }
 
     public DataBaseProvider() {
@@ -62,6 +68,13 @@ public class DataBaseProvider extends ContentProvider {
                 id = uri.getPathSegments().get(1);
                 count = db.delete(GeoLocTable.TABLE_NAME, GeoLocTable.Columns._ID + "=" + id + (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
                 break;
+            case URI_MATCH_OBSERVATION:
+                count = db.delete(ObservationTable.TABLE_NAME, selection, selectionArgs);
+                break;
+            case URI_MATCH_OBSERVATION_ID:
+                id = uri.getPathSegments().get(1);
+                count = db.delete(ObservationTable.TABLE_NAME, ObservationTable.Columns._ID + "=" + id + (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -81,6 +94,10 @@ public class DataBaseProvider extends ContentProvider {
                 return GeoLocTable.CONTENT_TYPE;
             case URI_MATCH_GEOLOC_ID:
                 return GeoLocTable.CONTENT_ITEM_TYPE;
+            case URI_MATCH_OBSERVATION:
+                return ObservationTable.CONTENT_TYPE;
+            case URI_MATCH_OBSERVATION_ID:
+                return ObservationTable.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -105,6 +122,14 @@ public class DataBaseProvider extends ContentProvider {
                 if (rowId > 0) {
                     Uri result = ContentUris.withAppendedId(GeoLocTable.CONTENT_URI, rowId);
                     getContext().getContentResolver().notifyChange(GeoLocTable.CONTENT_URI, null);
+                    return result;
+                }
+                break;
+            case URI_MATCH_OBSERVATION:
+                rowId = db.insert(ObservationTable.TABLE_NAME, null, values);
+                if (rowId > 0) {
+                    Uri result = ContentUris.withAppendedId(ObservationTable.CONTENT_URI, rowId);
+                    getContext().getContentResolver().notifyChange(ObservationTable.CONTENT_URI, null);
                     return result;
                 }
                 break;
@@ -157,6 +182,21 @@ public class DataBaseProvider extends ContentProvider {
                     orderBy = GeoLocTable.DEFAULT_SORT_ORDER;
                 }
                 break;
+            case URI_MATCH_OBSERVATION:
+                qb.setTables(ObservationTable.TABLE_NAME);
+                qb.setProjectionMap(ObservationTable.PROJECTION_MAP);
+                if (sortOrder == null) {
+                    orderBy = ObservationTable.DEFAULT_SORT_ORDER;
+                }
+                break;
+            case URI_MATCH_OBSERVATION_ID:
+                qb.setTables(ObservationTable.TABLE_NAME);
+                qb.setProjectionMap(ObservationTable.PROJECTION_MAP);
+                qb.appendWhere(ObservationTable.Columns._ID + "=" + uri.getPathSegments().get(1));
+                if (sortOrder == null) {
+                    orderBy = ObservationTable.DEFAULT_SORT_ORDER;
+                }
+                break;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);
         }
@@ -187,6 +227,13 @@ public class DataBaseProvider extends ContentProvider {
             case URI_MATCH_GEOLOC_ID:
                 id = uri.getPathSegments().get(1);
                 count = db.update(GeoLocTable.TABLE_NAME, values, GeoLocTable.Columns._ID + "=" + id + (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
+                break;
+            case URI_MATCH_OBSERVATION:
+                count = db.update(ObservationTable.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case URI_MATCH_OBSERVATION_ID:
+                id = uri.getPathSegments().get(1);
+                count = db.update(ObservationTable.TABLE_NAME, values, ObservationTable.Columns._ID + "=" + id + (!TextUtils.isEmpty(selection) ? " AND (" + selection + ')' : ""), selectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI " + uri);

@@ -5,4 +5,13 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <!-- xxx xxx xxx -->
+
+    <string name="mellow_hound">Mellow Hound</string>
+    <string name="mode_run">Run Mode</string>
+    <string name="mode_stop">Stop Mode</string>
+    <string name="sample_once">Sample Once</string>
 </resources>

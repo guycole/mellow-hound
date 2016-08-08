@@ -9,15 +9,16 @@ import net.braingang.houndlib.Constant;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  *
  */
 public class GeoLocModel implements DataBaseModel {
     private Long id;
+    private Long observationId;
     private Boolean activeFlag;
     private Date timeStamp;
-    private String note;
 
     private Float accuracy;
     private Double altitude;
@@ -28,9 +29,9 @@ public class GeoLocModel implements DataBaseModel {
     @Override
     public void setDefault() {
         id = 0L;
+        observationId = 0L;
         activeFlag = true;
         timeStamp = new Date();
-        note = "No Note";
 
         accuracy = 99999.9f;
         altitude = -1.0d;
@@ -42,16 +43,9 @@ public class GeoLocModel implements DataBaseModel {
     @Override
     public ContentValues toContentValues() {
         ContentValues cv = new ContentValues();
+        cv.put(GeoLocTable.Columns.OBSERVATION_ID, observationId.toString());
         cv.put(GeoLocTable.Columns.TIMESTAMP, formatter(timeStamp));
         cv.put(GeoLocTable.Columns.TIMESTAMP_MS, timeStamp.getTime());
-        cv.put(GeoLocTable.Columns.NOTE, note);
-
-        if (activeFlag) {
-            cv.put(GeoLocTable.Columns.ACTIVE_FLAG, Constant.SQL_TRUE);
-        } else {
-            cv.put(GeoLocTable.Columns.ACTIVE_FLAG, Constant.SQL_FALSE);
-        }
-
         cv.put(GeoLocTable.Columns.ACCURACY, accuracy.toString());
         cv.put(GeoLocTable.Columns.ALTITUDE, altitude.toString());
         cv.put(GeoLocTable.Columns.LATITUDE, latitude.toString());
@@ -64,12 +58,8 @@ public class GeoLocModel implements DataBaseModel {
     @Override
     public void fromCursor(Cursor cursor) {
         id = cursor.getLong(cursor.getColumnIndex(GeoLocTable.Columns._ID));
-
-        setActive(cursor.getInt(cursor.getColumnIndex(GeoLocTable.Columns.ACTIVE_FLAG)));
-
+        observationId = cursor.getLong(cursor.getColumnIndex(GeoLocTable.Columns.OBSERVATION_ID));
         timeStamp.setTime(cursor.getLong(cursor.getColumnIndex(GeoLocTable.Columns.TIMESTAMP_MS)));
-        note = cursor.getString(cursor.getColumnIndex(GeoLocTable.Columns.NOTE));
-
         accuracy = cursor.getFloat(cursor.getColumnIndex(GeoLocTable.Columns.ACCURACY));
         altitude = cursor.getDouble(cursor.getColumnIndex(GeoLocTable.Columns.ALTITUDE));
         latitude = cursor.getDouble(cursor.getColumnIndex(GeoLocTable.Columns.LATITUDE));
@@ -94,18 +84,11 @@ public class GeoLocModel implements DataBaseModel {
         id = arg;
     }
 
-    public boolean isActive() {
-        return activeFlag;
+    public Long getObservationId() {
+        return observationId;
     }
-    public void setActive(boolean arg) {
-        activeFlag = arg;
-    }
-    public void setActive(int arg) {
-        if (arg == Constant.SQL_TRUE) {
-            activeFlag = true;
-        } else {
-            activeFlag = false;
-        }
+    public void setObservationId(Long arg) {
+        observationId = arg;
     }
 
     public Date getTimeStamp() {
@@ -113,13 +96,6 @@ public class GeoLocModel implements DataBaseModel {
     }
     public void setTimeStamp(Date arg) {
         timeStamp = arg;
-    }
-
-    public String getNote() {
-        return note;
-    }
-    public void setNote(String arg) {
-        note = arg;
     }
 
     public void fromLocation(Location arg) {
@@ -134,6 +110,7 @@ public class GeoLocModel implements DataBaseModel {
     private String formatter(Date arg) {
         //Sat, 18 Jun 2011 09:53:00 -0700
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         return sdf.format(arg);
     }
 }

@@ -1,28 +1,40 @@
 package net.braingang.mellow.hound.app;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import android.view.Menu;
+import android.view.MenuItem;
+import net.braingang.houndlib.ModeManager;
 import net.braingang.houndlib.service.GeoLocService;
+import net.braingang.houndlib.service.NoiseService;
 import net.braingang.mellow.hound.R;
 
 
 public class MainActivity extends AppCompatActivity implements MainActivityListener {
     public static final String LOG_TAG = MainActivity.class.getName();
 
-    private static final int BASE_REQUEST = 1234;
-    private static final int COARSE_LOCATION_REQUEST = BASE_REQUEST;
-    private static final int FINE_LOCATION_REQUEST = BASE_REQUEST+1;
-    private static final int EXTERNAL_STORAGE_REQUEST = BASE_REQUEST+2;
+    public static final int BASE_REQUEST = 1234;
+    public static final int COARSE_LOCATION_REQUEST = BASE_REQUEST;
+    public static final int FINE_LOCATION_REQUEST = BASE_REQUEST+1;
+    public static final int READ_PHONE_STATE_REQUEST = BASE_REQUEST+2;
+    public static final int EXTERNAL_STORAGE_REQUEST = BASE_REQUEST+3;
 
-    private DrawerLayout drawerLayout;
+    private final ModeManager modeManager = new ModeManager();
+
+    private SectionPagerAdapter sectionPagerAdapter;
+    private ViewPager viewPager;
 
     // MainActivityListener
     @Override
@@ -32,11 +44,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityListe
 
     // MainActivityListener
     public void navDrawerOpen(boolean arg) {
+        /*
         if (arg) {
             drawerLayout.openDrawer(GravityCompat.START);
         } else {
             drawerLayout.closeDrawer(GravityCompat.END);
         }
+        */
     }
 
     @Override
@@ -44,54 +58,138 @@ public class MainActivity extends AppCompatActivity implements MainActivityListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (canAccessCoarseLocation()) {
-            Log.i(LOG_TAG, "coarse already granted");
-        } else {
-            Log.i(LOG_TAG, "coarse must granted");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, COARSE_LOCATION_REQUEST);
-        }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        if (canAccessFineLocation()) {
-            Log.i(LOG_TAG, "fine already granted");
-        } else {
-            Log.i(LOG_TAG, "fine must granted");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_REQUEST);
-        }
+        sectionPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
 
-        if (canAccessExternalStorage()) {
-            Log.i(LOG_TAG, "storage already granted");
-        } else {
-            Log.i(LOG_TAG, "storage must granted");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_REQUEST);
-        }
+        // Set up the ViewPager with the sections adapter.
+        viewPager = (ViewPager) findViewById(R.id.container);
+        viewPager.setAdapter(sectionPagerAdapter);
+    }
 
-     //   drawerLayout = (DrawerLayout) findViewById(R.id.navDrawerLayout);
-     //   drawerLayout.openDrawer(GravityCompat.START);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        permissionTest();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         Log.i(LOG_TAG, "onRequestPermissions:" + requestCode + ":" + permissions.length + ":" + grantResults.length);
+        for (int ii = 0; ii < permissions.length; ii++) {
+            Log.i(LOG_TAG, "permissions[" + ii + "]=" + permissions[ii]);
+            Log.i(LOG_TAG, "grant[" + ii + "]=" + grantResults[ii]);
 
-        if (canAccessCoarseLocation() && canAccessFineLocation()) {
-            GeoLocService.startGeoLoc(this, false);
-        } else {
-            Log.i(LOG_TAG, "unable to start geoloc");
+            if (grantResults[ii] < 0) {
+                Log.i(LOG_TAG, "skipping " + permissions[ii]);
+            } else {
+                if (permissions[ii].equals(Manifest.permission.READ_PHONE_STATE)) {
+                    NoiseService.startActionNotification(this);
+                }
+            }
         }
     }
 
+    private boolean permissionTest() {
+        Log.i(LOG_TAG, "permTest");
+
+        if (canAccessCoarseLocation()) {
+            Log.i(LOG_TAG, "perm coarse loc granted");
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, COARSE_LOCATION_REQUEST);
+            return true;
+        }
+
+        if (canAccessFineLocation()) {
+            Log.i(LOG_TAG, "perm fine loc granted");
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_REQUEST);
+            return true;
+        }
+
+        if (canReadPhoneState()) {
+            Log.i(LOG_TAG, "perm phone state granted");
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, READ_PHONE_STATE_REQUEST);
+            return true;
+        }
+
+        if (canAccessExternalStorage()) {
+            Log.i(LOG_TAG, "perm extern storage granted");
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_REQUEST);
+            return true;
+        }
+
+        return false;
+    }
+
     private boolean canAccessCoarseLocation() {
-        boolean flag = (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED);
-        return flag;
+        Log.i(LOG_TAG, "accessCoarse");
+        return (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED);
     }
 
     private boolean canAccessFineLocation() {
-        boolean flag = (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
-        return flag;
+        Log.i(LOG_TAG, "accessFine");
+        return (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
+    }
+
+    private boolean canReadPhoneState() {
+        Log.i(LOG_TAG, "phoneState");
+        return (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED);
     }
 
     private boolean canAccessExternalStorage() {
-        boolean flag = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-        return flag;
+        Log.i(LOG_TAG, "externalStore");
+        return (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_run_mode:
+                modeManager.setRunMode(true, getApplicationContext());
+                break;
+            case R.id.action_sample_mode:
+                modeManager.setSampleMode(getApplicationContext());
+                break;
+            case R.id.action_stop_mode:
+                modeManager.setRunMode(false, getApplicationContext());
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    /*
+    private void test() {
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        //       CellLocation location = telephonyManager.getCellLocation();
+        int networkType = telephonyManager.getNetworkType();
+        int dataState = telephonyManager.getDataState();
+        String deviceId = telephonyManager.getDeviceId();
+        String softwareVersion = telephonyManager.getDeviceSoftwareVersion();
+        String line1 = telephonyManager.getLine1Number();
+        String mmsUrl = telephonyManager.getMmsUAProfUrl();
+        String agent = telephonyManager.getMmsUserAgent();
+        String country = telephonyManager.getNetworkCountryIso();
+        String operator = telephonyManager.getNetworkOperator();
+        String opName = telephonyManager.getNetworkOperatorName();
+        int phoneType = telephonyManager.getPhoneType();
+        String countryIso = telephonyManager.getSimCountryIso();
+        String simOp = telephonyManager.getSimOperator();
+        String simOpName = telephonyManager.getSimOperatorName();
+        String simSerial = telephonyManager.getSimSerialNumber();
+        int simState = telephonyManager.getSimState();
+        String subId = telephonyManager.getSubscriberId();
+        Boolean roam = telephonyManager.isNetworkRoaming();
+    }
+    */
 }

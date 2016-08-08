@@ -30,4 +30,9 @@ public class Personality {
      *
      */
     public static Integer counter = 0;
+
+    /**
+     *
+     */
+    public static ModeEnum runMode;
 }

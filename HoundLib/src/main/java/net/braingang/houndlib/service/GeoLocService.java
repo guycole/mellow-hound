@@ -10,9 +10,6 @@ import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.telephony.CellInfo;
@@ -35,8 +32,8 @@ public class GeoLocService extends IntentService {
 
     public static final int REQUEST_CODE = 6789;
 
-    public static final float GEO_MIN_DISTANCE = 1000L;
-    public static final long GEO_MIN_TIME = 60 * 1000L;
+    public static final float GEO_MIN_DISTANCE = Constant.ONE_KILOMETER;
+    public static final long GEO_MIN_TIME = Constant.ONE_MINUTE;
 
     public static final long BLE_SCAN_DURATION = 3333L;
 
@@ -44,11 +41,23 @@ public class GeoLocService extends IntentService {
     private Handler bleScanHandler = new Handler();
 
     private FileFacade fileFacade = new FileFacade();
-    private Observation observation = new Observation();
+    private Observation observation;
     private UserPreferenceHelper userPreferenceHelper = new UserPreferenceHelper();
 
     public GeoLocService() {
         super("GeoLocService");
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.d(LOG_TAG, "xxx xxx onCreate xxx xxx");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(LOG_TAG, "xxx xxx onDestroy xxx xxx");
     }
 
     /**
@@ -94,11 +103,25 @@ public class GeoLocService extends IntentService {
 
         Bundle bundle = intent.getExtras();
         if ((bundle != null) && (bundle.containsKey(LocationManager.KEY_LOCATION_CHANGED))) {
+            TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            String operator = telephonyManager.getNetworkOperator();
+            String operatorName = telephonyManager.getNetworkOperatorName();
+
+            observation = new Observation(operator, operatorName);
+
             Location location = (Location) bundle.get(LocationManager.KEY_LOCATION_CHANGED);
             freshLocation(location);
 
             if (userPreferenceHelper.isBleCollection(this)) {
                 collectBle();
+
+                while (!bleScanComplete) {
+                    try {
+                        Thread.sleep(Constant.THIRTY_SECOND);
+                    } catch(Exception exception) {
+                        exception.printStackTrace();
+                    }
+                }
             } else {
                 Log.i(LOG_TAG, "BLE collection disabled");
             }
@@ -115,18 +138,10 @@ public class GeoLocService extends IntentService {
                 Log.i(LOG_TAG, "WiFi collection disabled");
             }
 
-            while (!bleScanComplete) {
-                try {
-                    Thread.sleep(Constant.THIRTY_SECOND);
-                } catch(Exception exception) {
-                    exception.printStackTrace();
-                }
-            }
-
-            fileFacade.writeObservation(observation, this);
+            //fileFacade.writeObservation(observation, this);
+            observation.toDataBase(this);
         } else {
             Log.i(LOG_TAG, "skipping intent w/missing location");
-            return;
         }
     }
 
@@ -205,22 +220,5 @@ public class GeoLocService extends IntentService {
             Log.i(LOG_TAG, "current location fail");
             saveFreshLocation(location);
         }
-    }
-
-    private void playAlert() {
-        Log.i(LOG_TAG, "playAlert");
-
-        try {
-            Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), ringtoneUri);
-            ringtone.play();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-    }
-
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(LOG_TAG, "xxx xxx onDestroy xxx xxx");
     }
 }

@@ -18,14 +18,32 @@ public class ContentFacade {
         model.setId(ContentUris.parseId(uri));
     }
 
-    public GeoLocModel insertLocation(Location location, Context context) {
+    public GeoLocModel insertLocation(Long observationId, Location location, Context context) {
         GeoLocModel model = new GeoLocModel();
         model.setDefault();
+        model.setObservationId(observationId);
         model.fromLocation(location);
         insertGeoLoc(model, context);
         Log.i(LOG_TAG, "insert geoloc:" + model.getId());
         return model;
     }
+
+    public void insertObservation(ObservationModel model, Context context) {
+        Uri uri = context.getContentResolver().insert(ObservationTable.CONTENT_URI, model.toContentValues());
+        model.setId(ContentUris.parseId(uri));
+    }
+
+    public ObservationModel insertObservation(String networkName, String networkOperator, Context context) {
+        ObservationModel model = new ObservationModel();
+        model.setDefault();
+        model.setNetworkName(networkName);
+        model.setNetworOperator(networkOperator);
+        insertObservation(model, context);
+        Log.i(LOG_TAG, "insert observation:" + model.getId());
+        return model;
+    }
+
+    ///////////////
 
     public void insertCellular(CellularModel model, Context context) {
         Uri uri = context.getContentResolver().insert(CellularTable.CONTENT_URI, model.toContentValues());

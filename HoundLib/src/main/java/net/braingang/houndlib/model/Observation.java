@@ -8,6 +8,9 @@ import android.telephony.CellInfo;
 
 import net.braingang.houndlib.Personality;
 
+import net.braingang.houndlib.db.ContentFacade;
+import net.braingang.houndlib.db.GeoLocModel;
+import net.braingang.houndlib.db.ObservationModel;
 import net.braingang.houndlib.utility.UserPreferenceHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,11 +24,19 @@ import java.util.List;
  * container
  */
 public class Observation implements Serializable {
-    ArrayList<BlueToothLowEnergy> ble = new ArrayList<BlueToothLowEnergy>();
-    ArrayList<Cellular> cellular = new ArrayList<Cellular>();
-    ArrayList<WiFi> wiFi = new ArrayList<WiFi>();
+    private ArrayList<BlueToothLowEnergy> ble = new ArrayList<BlueToothLowEnergy>();
+    private ArrayList<Cellular> cellular = new ArrayList<Cellular>();
+    private ArrayList<WiFi> wiFi = new ArrayList<WiFi>();
 
-    GeoLoc geoLoc;
+    private GeoLoc geoLoc;
+
+    private String operator;
+    private String operatorName;
+
+    public Observation(String operator, String operatorName) {
+        this.operator = operator;
+        this.operatorName = operatorName;
+    }
 
     public ArrayList<BlueToothLowEnergy> getBle() {
         return ble;
@@ -65,6 +76,14 @@ public class Observation implements Serializable {
         setGeoLoc(new GeoLoc(location));
     }
 
+    public void toDataBase(Context context) {
+        ContentFacade contentFacade = new ContentFacade();
+
+        ObservationModel observationModel = contentFacade.insertObservation(operator, operatorName, context);
+
+        contentFacade.insertLocation(observationModel.getId(), geoLoc.getRawLocation(), context);
+    }
+
     public JSONObject toJson(Context context) throws JSONException {
         UserPreferenceHelper userPreferenceHelper = new UserPreferenceHelper();
 
@@ -96,7 +115,7 @@ public class Observation implements Serializable {
     }
 
     public String toString() {
-        String results = "Observation:";
+        String results = "ObservationTable:";
 
         if (ble == null) {
             results += ":ble:null";
