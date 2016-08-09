@@ -1,15 +1,10 @@
 package net.braingang.houndlib;
 
 import android.app.Application;
-import android.content.Context;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiManager;
-import android.telephony.CellLocation;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import net.braingang.houndlib.service.OutboundService;
-import net.braingang.houndlib.service.TestService;
 import net.braingang.houndlib.utility.UserPreferenceHelper;
 
 import java.util.ArrayList;
@@ -33,27 +28,15 @@ public class HoundApplication extends Application {
         ModeManager modeManager = new ModeManager();
         modeManager.setRunMode(false, this);
 
-        /*
-        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        if (!wifiManager.isWifiEnabled()) {
-            Log.i(LOG_TAG, "wifi disabled");
-        } else {
-            wifiManager.setWifiEnabled(true);
-            wifiManager.startScan();
-        }
-        */
-
         UserPreferenceHelper userPreferenceHelper = new UserPreferenceHelper();
         if (userPreferenceHelper.isEmptyPreferences(this)) {
             userPreferenceHelper.writeDefaults(this);
-//            userPreferenceHelper.setBleCollection(this, true);
-//            userPreferenceHelper.setCellularCollection(this, true);
-//            userPreferenceHelper.setWiFiCollection(this, true);
+            userPreferenceHelper.setBleCollection(this, true);
+            userPreferenceHelper.setCellularCollection(this, true);
+            userPreferenceHelper.setWiFiCollection(this, true);
         }
 
-       // OutboundService.startOutbound(this, Constant.ONE_HOUR);
-//        TestService.startAlarmManager(this, Constant.TEN_MINUTE/2);
-
+        OutboundService.startAlarmManager(this, Constant.ONE_HOUR);
     }
 
     @Override

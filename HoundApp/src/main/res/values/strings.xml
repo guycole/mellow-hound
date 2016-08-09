@@ -8,10 +8,20 @@
 
     <string name="section_format">Hello World from section: %1$d</string>
 
+    <string name="stub">Stub</string>
+
     <!-- xxx xxx xxx -->
 
     <string name="mellow_hound">Mellow Hound</string>
+
     <string name="mode_run">Run Mode</string>
     <string name="mode_stop">Stop Mode</string>
     <string name="sample_once">Sample Once</string>
+
+    <string name="last_sample_time">Last Sample:</string>
+    <string name="operating_mode">Operating Mode:</string>
+    <string name="upload_population">Upload Pop:</string>
+    <string name="waiting_population">Waiting Pop:</string>
+
+    <string name="refresh">Refresh</string>
 </resources>

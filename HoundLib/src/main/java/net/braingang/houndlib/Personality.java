@@ -22,17 +22,17 @@ public class Personality {
     public static PendingIntent geoLocPending;
 
     /**
-     *
+     * Accumulated WiFi observations
      */
     public static ArrayList<ScanResult> wifiScanList;
 
     /**
-     *
+     * Total quantity of files uploaded
      */
-    public static Integer counter = 0;
+    public static Integer uploadCounter = 0;
 
     /**
-     *
+     * Current Run Mode
      */
     public static ModeEnum runMode;
 }

@@ -1,6 +1,7 @@
 package net.braingang.houndlib.model;
 
 import android.net.wifi.ScanResult;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 

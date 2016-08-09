@@ -1,7 +1,9 @@
 package net.braingang.houndlib;
 
 import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.util.Log;
+
 import net.braingang.houndlib.service.GeoLocService;
 
 /**
@@ -13,12 +15,24 @@ public class ModeManager {
     public void setRunMode(boolean startFlag, Context context) {
         Log.i(LOG_TAG, "setRunMode:" + startFlag);
 
-        if (startFlag) {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 
+        if (startFlag) {
+            Personality.runMode = ModeEnum.RUNNING;
+
+            if (!wifiManager.isWifiEnabled()) {
+                Log.i(LOG_TAG, "wifi disabled");
+            } else {
+                wifiManager.setWifiEnabled(true);
+                wifiManager.startScan();
+            }
+
+            GeoLocService.startGeoLoc(context, false);
         } else {
             Personality.runMode = ModeEnum.STOPPED;
-        }
 
+            GeoLocService.stopGeoLoc(context);
+        }
     }
 
     public void setSampleMode(Context context) {

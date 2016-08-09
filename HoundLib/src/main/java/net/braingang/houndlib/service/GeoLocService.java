@@ -33,7 +33,7 @@ public class GeoLocService extends IntentService {
     public static final int REQUEST_CODE = 6789;
 
     public static final float GEO_MIN_DISTANCE = Constant.ONE_KILOMETER;
-    public static final long GEO_MIN_TIME = Constant.ONE_MINUTE;
+    public static final long GEO_MIN_TIME = Constant.TWO_MINUTE;
 
     public static final long BLE_SCAN_DURATION = 3333L;
 
@@ -98,16 +98,14 @@ public class GeoLocService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Log.i(LOG_TAG, "onHandleIntent");
 
-        Personality.counter += 1;
-        Log.i(LOG_TAG, "counter:" + Personality.counter);
-
         Bundle bundle = intent.getExtras();
         if ((bundle != null) && (bundle.containsKey(LocationManager.KEY_LOCATION_CHANGED))) {
             TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+            String phone1 = telephonyManager.getLine1Number();
             String operator = telephonyManager.getNetworkOperator();
             String operatorName = telephonyManager.getNetworkOperatorName();
 
-            observation = new Observation(operator, operatorName);
+            observation = new Observation(phone1, operator, operatorName);
 
             Location location = (Location) bundle.get(LocationManager.KEY_LOCATION_CHANGED);
             freshLocation(location);
@@ -138,8 +136,7 @@ public class GeoLocService extends IntentService {
                 Log.i(LOG_TAG, "WiFi collection disabled");
             }
 
-            //fileFacade.writeObservation(observation, this);
-            observation.toDataBase(this);
+            fileFacade.writeObservation(observation, this);
         } else {
             Log.i(LOG_TAG, "skipping intent w/missing location");
         }
@@ -181,16 +178,6 @@ public class GeoLocService extends IntentService {
 
     private void collectCellular() {
         TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-
-        String operator = telephonyManager.getNetworkOperator();
-        if ((operator != null) && (!operator.isEmpty())) {
-            userPreferenceHelper.setNetworkOperator(this, operator);
-        }
-
-        String opName = telephonyManager.getNetworkOperatorName();
-        if ((opName != null) && (!opName.isEmpty())) {
-            userPreferenceHelper.setNetworkName(this, opName);
-        }
 
         List<CellInfo> cellList = telephonyManager.getAllCellInfo();
 

@@ -1,26 +1,20 @@
 package net.braingang.mellow.hound.app;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.telephony.TelephonyManager;
 import android.util.Log;
-
 import android.view.Menu;
 import android.view.MenuItem;
+
 import net.braingang.houndlib.ModeManager;
-import net.braingang.houndlib.service.GeoLocService;
 import net.braingang.houndlib.service.NoiseService;
 import net.braingang.mellow.hound.R;
-
 
 public class MainActivity extends AppCompatActivity implements MainActivityListener {
     public static final String LOG_TAG = MainActivity.class.getName();
@@ -35,23 +29,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityListe
 
     private SectionPagerAdapter sectionPagerAdapter;
     private ViewPager viewPager;
-
-    // MainActivityListener
-    @Override
-    public void fragmentSelect(MainActivityFragmentEnum selected, Bundle args) {
-        String tag = "bogus";
-    }
-
-    // MainActivityListener
-    public void navDrawerOpen(boolean arg) {
-        /*
-        if (arg) {
-            drawerLayout.openDrawer(GravityCompat.START);
-        } else {
-            drawerLayout.closeDrawer(GravityCompat.END);
-        }
-        */
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityListe
                 Log.i(LOG_TAG, "skipping " + permissions[ii]);
             } else {
                 if (permissions[ii].equals(Manifest.permission.READ_PHONE_STATE)) {
-                    NoiseService.startActionNotification(this);
+  //                  NoiseService.startActionNotification(this);
                 }
             }
         }
@@ -167,29 +144,4 @@ public class MainActivity extends AppCompatActivity implements MainActivityListe
 
         return super.onOptionsItemSelected(item);
     }
-
-    /*
-    private void test() {
-        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        //       CellLocation location = telephonyManager.getCellLocation();
-        int networkType = telephonyManager.getNetworkType();
-        int dataState = telephonyManager.getDataState();
-        String deviceId = telephonyManager.getDeviceId();
-        String softwareVersion = telephonyManager.getDeviceSoftwareVersion();
-        String line1 = telephonyManager.getLine1Number();
-        String mmsUrl = telephonyManager.getMmsUAProfUrl();
-        String agent = telephonyManager.getMmsUserAgent();
-        String country = telephonyManager.getNetworkCountryIso();
-        String operator = telephonyManager.getNetworkOperator();
-        String opName = telephonyManager.getNetworkOperatorName();
-        int phoneType = telephonyManager.getPhoneType();
-        String countryIso = telephonyManager.getSimCountryIso();
-        String simOp = telephonyManager.getSimOperator();
-        String simOpName = telephonyManager.getSimOperatorName();
-        String simSerial = telephonyManager.getSimSerialNumber();
-        int simState = telephonyManager.getSimState();
-        String subId = telephonyManager.getSubscriberId();
-        Boolean roam = telephonyManager.isNetworkRoaming();
-    }
-    */
 }

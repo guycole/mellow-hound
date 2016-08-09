@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.braingang.houndlib">
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="net.braingang.houndlib">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -14,40 +14,18 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application>
+        <service android:name=".service.GeoLocService" android:enabled="true" android:exported="false" />
+        <service android:name=".service.NoiseService" android:enabled="true" android:exported="false"/>
+        <service android:name=".service.OutboundService" android:enabled="true" android:exported="false" />
 
-        <provider
-            android:name=".db.DataBaseProvider"
-            android:authorities="net.braingang.houndlib.dbprovider"
-            android:enabled="true"
-            android:exported="false" />
+        <service android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService" android:enabled="true" />
 
-        <service
-            android:name=".service.GeoLocService"
-            android:enabled="true"
-            android:exported="false" />
-        <service
-            android:name=".service.OutboundService"
-            android:enabled="true"
-            android:exported="false" />
-        <service
-            android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
-            android:enabled="true" />
-
-        <receiver
-            android:name=".service.ScanReceiver"
-            android:enabled="true"
-            android:exported="false">
+        <receiver android:name=".service.ScanReceiver" android:enabled="true" android:exported="false">
             <intent-filter>
                 <action android:name="android.net.wifi.SCAN_RESULTS" />
             </intent-filter>
         </receiver>
 
-        <service
-            android:name=".service.TestService"
-            android:exported="false" />
-        <service
-            android:name=".service.NoiseService"
-            android:exported="false"></service>
-    </application>
 
+    </application>
 </manifest>

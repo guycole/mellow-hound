@@ -12,11 +12,18 @@ import java.io.Serializable;
  */
 public class BlueToothLowEnergy implements Serializable {
     private String address;
+    private String name;
     private int rssi;
     private byte[] scanRecord;
 
     public BlueToothLowEnergy(BluetoothDevice device, int rssi, byte[] scanRecord) {
         address = device.getAddress();
+
+        name = device.getName();
+        if ((name == null) || (name.length() < 1)) {
+            name = "unknown";
+        }
+
         this.rssi = rssi;
         this.scanRecord = scanRecord.clone();
     }
@@ -25,10 +32,12 @@ public class BlueToothLowEnergy implements Serializable {
         JSONObject jsonObject = new JSONObject();
 
         jsonObject.put("address", address);
+        jsonObject.put("name", name);
         jsonObject.put("rssi", rssi);
 
         StringBuffer buffer = new StringBuffer();
         for (int ii = 0; ii < scanRecord.length; ii++) {
+            System.out.println(ii + ":" + scanRecord.length);
             buffer.append(Integer.toHexString(0xff & scanRecord[ii]) + ",");
         }
         jsonObject.put("rawScan", buffer.toString());
