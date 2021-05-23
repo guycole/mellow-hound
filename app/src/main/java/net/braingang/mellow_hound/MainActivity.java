@@ -10,10 +10,11 @@ import android.view.View;
 
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.shastrax.basicactivity.databinding.ActivityMainBinding;
+import net.braingang.mellow_hound.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;

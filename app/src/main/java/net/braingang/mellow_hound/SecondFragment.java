@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.shastrax.basicactivity.databinding.FragmentSecondBinding;
+import net.braingang.mellow_hound.databinding.FragmentSecondBinding;
 
 public class SecondFragment extends Fragment {
 
