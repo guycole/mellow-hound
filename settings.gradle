@@ -1,1 +1,2 @@
-include ':HoundApp', ':HoundLib'
+rootProject.name = "mellow_hound"
+include ':app'
