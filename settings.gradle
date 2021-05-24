@@ -1,2 +1,2 @@
-rootProject.name = "mellow_hound"
+rootProject.name = "MellowHound"
 include ':app'
