@@ -1,12 +1,11 @@
-package net.braingang.mellow_heeler;
+package net.braingang.mellow_hound;
 
-import android.app.PendingIntent;
+import com.google.android.gms.location.LocationResult;
 
 public class Personality {
 
     /**
-     * GeoLocService pending intent
+     *
      */
-    public static PendingIntent geoLocPending;
-
+    public static LocationResult locationResult;
 }

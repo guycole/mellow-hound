@@ -33,6 +33,8 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements HoundListener, ActivityCompat.OnRequestPermissionsResultCallback {
     public static final String LOG_TAG = MainActivity.class.getName();
 
@@ -76,7 +78,6 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
             Log.i(LOG_TAG, "must ask location permission");
 
             String[] permissions = {
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.INTERNET,
@@ -154,15 +155,15 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
             Log.i(LOG_TAG, "xxxxxxx onReceive xxxxxxxxxx");
 
             WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+            List<ScanResult> scanResults = wifiManager.getScanResults();
 
-            for (ScanResult candidate:wifiManager.getScanResults()) {
-                int frequency = candidate.frequency;
-                int level = candidate.level;
-                String ssid = candidate.SSID;
-                String bssid = candidate.BSSID;
-                String capabilities = candidate.capabilities;
-
-                Log.i(LOG_TAG, "scan:" + frequency + ":" + level + ":" + ssid + ":" + bssid + ":" + capabilities);
+            if (scanResults.size() > 0) {
+                Log.i(LOG_TAG, "scan results:" + scanResults.size());
+                Observation observation = new Observation(Personality.locationResult, scanResults);
+                FileFacade fileFacade = new FileFacade();
+                fileFacade.writeObservation(observation, getApplicationContext());
+            } else {
+                Log.i(LOG_TAG, "scan results empty");
             }
         }
     };

@@ -39,15 +39,12 @@ public class EclecticService extends IntentService {
         WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
         if (LocationResult.hasResult(intent)) {
-            LocationResult locationResult = LocationResult.extractResult(intent);
-            Log.i(LOG_TAG, "result:" + locationResult);
-            GeoLoc geoLoc = new GeoLoc(locationResult.getLastLocation());
+            Personality.locationResult = LocationResult.extractResult(intent);
 
             if (!wifiManager.isWifiEnabled()) {
                 Log.i(LOG_TAG, "wifi disabled");
             } else {
                 Log.i(LOG_TAG, "wifi enabled");
-                //wifiManager.setWifiEnabled(true);
                 wifiManager.startScan();
             }
         } else {
