@@ -33,6 +33,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.io.File;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements HoundListener, ActivityCompat.OnRequestPermissionsResultCallback {
@@ -112,13 +113,18 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
         Log.i(LOG_TAG, "start start start");
 
         getPermissions();
-
-
     }
 
     @Override
     public void onCollectionStop() {
         Log.i(LOG_TAG, "stop stop stop");
+
+        FileFacade ff = new FileFacade();
+        File[] files = ff.getObservations(this);
+        Log.i(LOG_TAG, "file array:" + files.length);
+
+        AwsUpload upload = new AwsUpload();
+        upload.writer(this, files);
     }
 
     @Override

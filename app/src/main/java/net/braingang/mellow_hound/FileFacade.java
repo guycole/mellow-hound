@@ -36,7 +36,7 @@ public class FileFacade {
         }
     }
 
-    public File[] getOutboundObservation(Context context) {
+    public File[] getObservations(Context context) {
         File root = new File(context.getExternalFilesDir(null).getAbsolutePath());
         return root.listFiles();
     }
