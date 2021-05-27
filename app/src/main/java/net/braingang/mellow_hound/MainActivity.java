@@ -112,6 +112,8 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
         Log.i(LOG_TAG, "start start start");
 
         getPermissions();
+
+
     }
 
     @Override
