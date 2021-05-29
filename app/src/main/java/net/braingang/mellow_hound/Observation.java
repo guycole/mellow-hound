@@ -49,7 +49,7 @@ public class Observation implements Serializable {
     public JSONObject toJson(Context context) throws JSONException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("version", 1);
-
+        jsonObject.put("project", "hound");
         jsonObject.put("geoLoc", geoLoc.toJson());
 
         JSONArray wiFiArray = new JSONArray();
