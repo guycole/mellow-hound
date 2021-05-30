@@ -4,17 +4,25 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import net.braingang.mellow_hound.databinding.FragmentControlBinding;
 
 public class ControlFragment extends Fragment {
+    public static final String LOG_TAG = ControlFragment.class.getName();
 
+    private ControlViewModel controlViewModel;
     private FragmentControlBinding binding;
+
+    @Override
+    public void onStart() {
+        controlViewModel = new ViewModelProvider(this).get(ControlViewModel.class);
+//        ControlViewModel controlViewModel = ViewModelProvider.of(getActivity()).get(ControlViewModel.class);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

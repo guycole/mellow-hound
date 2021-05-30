@@ -11,7 +11,7 @@
         android:id="@+id/textview_mode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@{viewmodel.runMode}"
+        android:text="@string/stopped"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/button_start"
@@ -27,6 +27,16 @@
         app:layout_constraintBottom_toTopOf="@id/button_stop"
         app:layout_constraintTop_toBottomOf="@id/textview_mode" />
 
+    <TextView
+        android:id="@+id/textview_counter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/unknown"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/button_stop"
+        app:layout_constraintTop_toTopOf="@id/button_start" />
+
     <Button
         android:id="@+id/button_stop"
         android:layout_width="wrap_content"
@@ -35,7 +45,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/button_nav2list"
-        app:layout_constraintTop_toBottomOf="@id/button_start" />
+        app:layout_constraintTop_toBottomOf="@id/textview_counter" />
 
     <Button
         android:id="@+id/button_nav2list"
