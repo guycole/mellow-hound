@@ -1,21 +1,10 @@
 package net.braingang.mellow_hound;
 
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.location.Location;
 import android.net.wifi.ScanResult;
-import android.telephony.CellInfo;
-
-import android.telephony.CellInfoCdma;
-import android.telephony.CellInfoGsm;
-import android.telephony.CellInfoLte;
-import android.telephony.CellInfoWcdma;
 import android.util.Log;
 
 import com.google.android.gms.location.LocationResult;
-
-import net.braingang.mellow_hound.Personality;
-//import net.braingang.houndlib.utility.UserPreferenceHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,8 +19,9 @@ import java.util.List;
  * container
  */
 public class Observation implements Serializable {
-    private ArrayList<WiFi> wiFi = new ArrayList<WiFi>();
+    public static final String LOG_TAG = Observation.class.getName();
 
+    private ArrayList<WiFi> wiFi = new ArrayList<WiFi>();
     private GeoLoc geoLoc;
 
     public Observation(LocationResult locationResult, List<ScanResult> scanResults) {

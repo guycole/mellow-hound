@@ -13,19 +13,16 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.util.Log;
-
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import net.braingang.mellow_hound.databinding.ActivityMainBinding;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -156,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
     }
 
     private BroadcastReceiver scanReceiver = new BroadcastReceiver() {
-        //private MainHelper mainHelper = new MainHelper();
 
         @Override
         public void onReceive(Context arg0, Intent arg1) {
@@ -168,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
             if (scanResults.size() > 0) {
                 Log.i(LOG_TAG, "scan results:" + scanResults.size());
                 Observation observation = new Observation(Personality.locationResult, scanResults);
+
                 FileFacade fileFacade = new FileFacade();
                 fileFacade.writeObservation(observation, getApplicationContext());
             } else {

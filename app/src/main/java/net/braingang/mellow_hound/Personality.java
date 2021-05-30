@@ -9,5 +9,4 @@ public class Personality {
      */
     public static LocationResult locationResult;
 
- 
 }
