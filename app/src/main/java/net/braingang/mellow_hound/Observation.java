@@ -2,7 +2,6 @@ package net.braingang.mellow_hound;
 
 import android.content.Context;
 import android.net.wifi.ScanResult;
-import android.util.Log;
 
 import com.google.android.gms.location.LocationResult;
 

@@ -1,6 +1,6 @@
 package net.braingang.mellow_hound;
 
-import android.content.Context;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -13,7 +13,7 @@ public class ControlViewModel extends ViewModel {
     private MutableLiveData<String> mutableRunMode = new MutableLiveData<>();
 
     public ControlViewModel() {
-        // empty
+        Log.i(LOG_TAG, "ControlViewModel ctor");
     }
 
     public LiveData<String> getCounter() {
@@ -22,14 +22,14 @@ public class ControlViewModel extends ViewModel {
 
     public void setCounter(int observationCount, int fileCount) {
         String buffer = Integer.toString(observationCount) + ":" + Integer.toString(fileCount);
-        mutableCounter = new MutableLiveData<String>(buffer);
+        mutableCounter.setValue(buffer);
     }
 
     public LiveData<String> getRunMode() {
         return mutableRunMode;
     }
 
-    public void setRunMode(String runMode) {
-        mutableRunMode = new MutableLiveData<String>(runMode);
+    public void setRunMode(String arg) {
+        mutableRunMode.setValue(arg);
     }
 }

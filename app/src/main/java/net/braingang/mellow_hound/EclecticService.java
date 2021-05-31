@@ -6,10 +6,7 @@ import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 public class EclecticService extends IntentService {
     public static final String LOG_TAG = EclecticService.class.getName();

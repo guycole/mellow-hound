@@ -8,10 +8,11 @@
     tools:context=".ControlFragment">
 
     <TextView
-        android:id="@+id/textview_mode"
+        android:id="@+id/tv_mode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/stopped"
+        android:textSize="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/button_start"
@@ -25,13 +26,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/button_stop"
-        app:layout_constraintTop_toBottomOf="@id/textview_mode" />
+        app:layout_constraintTop_toBottomOf="@id/tv_mode" />
 
     <TextView
-        android:id="@+id/textview_counter"
+        android:id="@+id/tv_counter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/unknown"
+        android:textSize="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/button_stop"
@@ -44,14 +46,14 @@
         android:text="@string/button_stop_collection"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/button_nav2list"
-        app:layout_constraintTop_toBottomOf="@id/textview_counter" />
+        app:layout_constraintBottom_toTopOf="@id/button_upload"
+        app:layout_constraintTop_toBottomOf="@id/tv_counter" />
 
     <Button
-        android:id="@+id/button_nav2list"
+        android:id="@+id/button_upload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/button_list_fragment"
+        android:text="@string/button_upload"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

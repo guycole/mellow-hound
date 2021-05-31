@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
@@ -15,6 +16,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -38,13 +40,18 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
+    private ControlViewModel controlViewModel;
     private FusedLocationProviderClient fusedLocationClient;
+    private PendingIntent pi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Log.i(LOG_TAG, "onCreate onCreate onCreate");
+
+        // not all phones respect manifest android:screenOrientation="portrait"
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -54,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+
+        controlViewModel = new ViewModelProvider(this).get(ControlViewModel.class);
     }
 
     @Override
@@ -99,10 +108,23 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
         locationRequest.setFastestInterval(Constant.THIRTY_SECOND);
 
         Intent intent = new Intent(this, EclecticService.class);
-        PendingIntent pi = PendingIntent.getService(this, EclecticService.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        pi = PendingIntent.getService(this, EclecticService.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         fusedLocationClient.requestLocationUpdates(locationRequest, pi);
+
+        controlViewModel.setRunMode(getString(R.string.running));
+    }
+
+    @Override
+    public void onAwsUpload() {
+        Log.i(LOG_TAG, "upload upload upload");
+
+        FileFacade fileFacade = new FileFacade();
+        File[] files = fileFacade.getObservations(this);
+
+        AwsUpload upload = new AwsUpload();
+        upload.writer(this, files);
     }
 
     @Override
@@ -116,12 +138,13 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
     public void onCollectionStop() {
         Log.i(LOG_TAG, "stop stop stop");
 
+        controlViewModel.setRunMode(getString(R.string.stopped));
+
         FileFacade ff = new FileFacade();
         File[] files = ff.getObservations(this);
         Log.i(LOG_TAG, "file array:" + files.length);
 
-        AwsUpload upload = new AwsUpload();
-        upload.writer(this, files);
+        fusedLocationClient.removeLocationUpdates(pi);
     }
 
     @Override
@@ -158,6 +181,8 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
         public void onReceive(Context arg0, Intent arg1) {
             Log.i(LOG_TAG, "xxxxxxx onReceive xxxxxxxxxx");
 
+            FileFacade fileFacade = new FileFacade();
+
             WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
             List<ScanResult> scanResults = wifiManager.getScanResults();
 
@@ -165,11 +190,14 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
                 Log.i(LOG_TAG, "scan results:" + scanResults.size());
                 Observation observation = new Observation(Personality.locationResult, scanResults);
 
-                FileFacade fileFacade = new FileFacade();
                 fileFacade.writeObservation(observation, getApplicationContext());
             } else {
                 Log.i(LOG_TAG, "scan results empty");
             }
+
+            File[] files = fileFacade.getObservations(getApplicationContext());
+
+            controlViewModel.setCounter(scanResults.size(), files.length);
         }
     };
 }

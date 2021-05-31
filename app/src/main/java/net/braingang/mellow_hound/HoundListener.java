@@ -5,4 +5,6 @@ public interface HoundListener {
     void onCollectionStart();
 
     void onCollectionStop();
+
+    void onAwsUpload();
 }
