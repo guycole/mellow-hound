@@ -27,30 +27,34 @@ public class AwsUpload {
 
         for (File file:files) {
             String key = file.getName();
-            Log.i(LOG_TAG, "uploading:" + key);
 
             TransferObserver observer = transferUtility.upload(Personality.AwsBucketName, key, file);
             observer.setTransferListener(new TransferListener() {
                 @Override
                 public void onStateChanged(int id, TransferState state) {
-                    Log.i(LOG_TAG, "onStateChanged:" + id);
-                    // do something
-                    //progress.hide();
-                    //path.setText("ID "+id+"\nState "+state.name()+"\nImage ID "+OBJECT_KEY);
+                    if (state == TransferState.COMPLETED) {
+                        Log.i(LOG_TAG,  "completed:" + observer.getKey());
+
+                        // delete uploaded file
+                        for (File target:files) {
+                            if (observer.getKey().equals(target.getName())) {
+                                Log.i(LOG_TAG, "deleted:" + target.getName());
+                                target.delete();
+                            }
+                        }
+                    } else {
+                        Log.i(LOG_TAG, "onStateChanged:" + id + ":" + state);
+                    }
                 }
 
                 @Override
                 public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-                    Log.i(LOG_TAG, "onProgressChanged:" + id);
-                    //int percentage = (int) (bytesCurrent / bytesTotal * 100);
-                    //progress.setProgress(percentage);
-                    //Display percentage transfered to user
+                    Log.i(LOG_TAG, "onProgressChanged:" + id + ":" + bytesCurrent + ":" + bytesTotal);
                 }
 
                 @Override
-                public void onError(int id, Exception ex) {
-                    // do something
-                    Log.e(LOG_TAG, "Error:" + id + ":" + ex);
+                public void onError(int id, Exception exception) {
+                    Log.e(LOG_TAG, "onError:" + id + ":" + exception);
                 }
             });
         }

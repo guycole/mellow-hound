@@ -118,8 +118,6 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
 
     @Override
     public void onAwsUpload() {
-        Log.i(LOG_TAG, "upload upload upload");
-
         FileFacade fileFacade = new FileFacade();
         File[] files = fileFacade.getObservations(this);
 
@@ -129,21 +127,12 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
 
     @Override
     public void onCollectionStart() {
-        Log.i(LOG_TAG, "start start start");
-
         getPermissions();
     }
 
     @Override
     public void onCollectionStop() {
-        Log.i(LOG_TAG, "stop stop stop");
-
         controlViewModel.setRunMode(getString(R.string.stopped));
-
-        FileFacade ff = new FileFacade();
-        File[] files = ff.getObservations(this);
-        Log.i(LOG_TAG, "file array:" + files.length);
-
         fusedLocationClient.removeLocationUpdates(pi);
     }
 

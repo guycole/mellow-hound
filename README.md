@@ -1,11 +1,8 @@
 # mellow-hound-android
 Mellow Hound Client (Android)
 
-Periodically collect information about cellular systems and WiFi access points.
+Periodically collect location and information WiFi access points.
 
-Every kilometer (or whenever Android feels like it) write to SQLite:
-* Current geographic location w/time stamp
-* Cellular parameters (from Telephony Manager)
-* WiFi access points (from Network Manager)
+About once a minute, collect location and scan WAP, then write to JSON formatted file.
 
-Write to server.
+When "upload" button is pushed, write to AWS S3 bucket and delete local file.
