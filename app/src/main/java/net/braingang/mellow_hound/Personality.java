@@ -13,4 +13,5 @@ public class Personality {
     public static String AwsSecretKey = "bogus";
     public static String AwsRegion = "us-east-1";
     public static String AwsBucketName = "bogus";
+
 }

@@ -1,6 +1,7 @@
 package net.braingang.mellow_hound;
 
 import android.app.Application;
+import android.os.Build;
 import android.util.Log;
 
 public class HoundApplication extends Application {
@@ -13,6 +14,13 @@ public class HoundApplication extends Application {
         Log.i(LOG_TAG, "xoxoxoxoxoxoxoxoxoxoxoxxoxoxoxoxoxo");
         Log.i(LOG_TAG, "xo start start start start start xo");
         Log.i(LOG_TAG, "xoxoxoxoxoxoxoxoxoxoxoxxoxoxoxoxoxo");
+
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        int version = Build.VERSION.SDK_INT;
+        String versionRelease = Build.VERSION.RELEASE;
+
+        Log.i(LOG_TAG, "manufacturer:" + manufacturer + ":model:" + model + ":version:" + version + ":versionRelease:" + versionRelease);
     }
 
     @Override

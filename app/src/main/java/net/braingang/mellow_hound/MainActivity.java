@@ -27,6 +27,7 @@ import net.braingang.mellow_hound.databinding.ActivityMainBinding;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -52,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
 
         // not all phones respect manifest android:screenOrientation="portrait"
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        // cannot sleep or collection stops
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
