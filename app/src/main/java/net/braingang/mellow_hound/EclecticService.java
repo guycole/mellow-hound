@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.util.Log;
 
 import com.google.android.gms.location.LocationResult;
@@ -32,6 +33,10 @@ public class EclecticService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         Log.i(LOG_TAG, "-x-x-x-x-x-x-x-x-x- onHandleIntent -x-x-x-x-x-x-x-x-x-");
+
+        if (intent != null) {
+
+        }
 
         WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 

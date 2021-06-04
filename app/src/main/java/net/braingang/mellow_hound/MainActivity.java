@@ -111,13 +111,17 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
         locationRequest.setInterval(Constant.ONE_MINUTE);
         locationRequest.setFastestInterval(Constant.THIRTY_SECOND);
 
-        Intent intent = new Intent(this, EclecticService.class);
-        pi = PendingIntent.getService(this, EclecticService.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //Intent intent = new Intent(this, EclecticService.class);
+        //pi = PendingIntent.getService(this, EclecticService.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         fusedLocationClient.requestLocationUpdates(locationRequest, pi);
 
         controlViewModel.setRunMode(getString(R.string.running));
+
+        Intent intent = new Intent(this, LocationUpdatesBroadcastReceiver.class);
+        intent.setAction(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
+        return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     @Override
