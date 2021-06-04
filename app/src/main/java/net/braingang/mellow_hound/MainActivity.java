@@ -39,6 +39,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements HoundListener, ActivityCompat.OnRequestPermissionsResultCallback {
     public static final String LOG_TAG = MainActivity.class.getName();
 
+    public static final int REQUEST_CODE = 6789;
+
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     private ControlViewModel controlViewModel;
@@ -73,43 +75,64 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
     protected void onResume() {
         super.onResume();
         Log.i(LOG_TAG, "onResume");
-        registerReceiver(scanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        //registerReceiver(scanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         Log.i(LOG_TAG, "onPause");
-        unregisterReceiver(scanReceiver);
+        //unregisterReceiver(scanReceiver);
     }
 
-    private void getPermissions() {
-        int permissionFlag = ContextCompat.checkSelfPermission(this, LocationManager.GPS_PROVIDER);
-        if (PackageManager.PERMISSION_DENIED == permissionFlag) {
-            Log.i(LOG_TAG, "must ask location permission");
+    private boolean checkPermissions() {
+        int permissionState = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        return permissionState == PackageManager.PERMISSION_GRANTED;
+    }
 
-            String[] permissions = {
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.INTERNET,
-                    Manifest.permission.ACCESS_WIFI_STATE
-            };
+    private void requestPermissions() {
+        String[] permissions = {
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.INTERNET,
+                Manifest.permission.ACCESS_WIFI_STATE
+        };
 
-            ActivityCompat.requestPermissions(this, permissions, EclecticService.REQUEST_CODE);
-        } else {
-            Log.i(LOG_TAG, "location permission granted");
-        }
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE);
+    }
+
+    private void requestLocationUpdates() {
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setInterval(Constant.ONE_MINUTE);
+        locationRequest.setFastestInterval(Constant.THIRTY_SECOND);
+
+        Intent intent = new Intent(this, LocationUpdatesBroadcastReceiver.class);
+        intent.setAction(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
+        pi = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationClient.requestLocationUpdates(locationRequest, pi);
+    }
+
+    private void removeLocationUpdates() {
+
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         Log.i(LOG_TAG, "onRequestPermissionsResult:" + requestCode);
 
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Log.i(LOG_TAG, "permissions granted");
+            requestLocationUpdates();
+        } else {
+            Log.i(LOG_TAG, "permissions denied");
+        }
+
+        /*
         // location manager access granted
-        LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        locationRequest.setInterval(Constant.ONE_MINUTE);
-        locationRequest.setFastestInterval(Constant.THIRTY_SECOND);
+
 
         //Intent intent = new Intent(this, EclecticService.class);
         //pi = PendingIntent.getService(this, EclecticService.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -119,9 +142,10 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
 
         controlViewModel.setRunMode(getString(R.string.running));
 
-        Intent intent = new Intent(this, LocationUpdatesBroadcastReceiver.class);
-        intent.setAction(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
-        return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //Intent intent = new Intent(this, LocationUpdatesBroadcastReceiver.class);
+        //intent.setAction(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
+        //return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+         */
     }
 
     @Override
@@ -135,7 +159,16 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
 
     @Override
     public void onCollectionStart() {
-        getPermissions();
+        if (checkPermissions()) {
+            Log.i(LOG_TAG, "permissions granted");
+        } else {
+            Log.i(LOG_TAG, "must ask permission");
+            requestPermissions();
+        }
+
+        requestLocationUpdates();
+
+        controlViewModel.setRunMode(getString(R.string.running));
     }
 
     @Override

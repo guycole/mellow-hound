@@ -22,19 +22,24 @@ import java.util.List;
  *  less frequently than the interval specified in the
  *  {@link com.google.android.gms.location.LocationRequest} when the app is no longer in the
  *  foreground.
+ *
+ * https://github.com/android/location-samples/blob/432d3b72b8c058f220416958b444274ddd186abd/LocationUpdatesPendingIntent/app/src/main/java/com/google/android/gms/location/sample/locationupdatespendingintent/LocationUpdatesBroadcastReceiver.java
  */
 public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
     public static final String LOG_TAG = LocationUpdatesBroadcastReceiver.class.getName();
 
-    static final String ACTION_PROCESS_UPDATES = "com.google.android.gms.location.sample.locationupdatespendingintent.action" + ".PROCESS_UPDATES";
+    static final String ACTION_PROCESS_UPDATES = "net.braingang.mellow_hound.PROCESS_UPDATES";
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.i(LOG_TAG, "xxx xxx onReceive xxx xxx");
+
         if (intent != null) {
             final String action = intent.getAction();
             if (ACTION_PROCESS_UPDATES.equals(action)) {
                 LocationResult result = LocationResult.extractResult(intent);
                 if (result != null) {
+                    Log.i(LOG_TAG, "intent not null");
                     List<Location> locations = result.getLocations();
                     //Utils.setLocationUpdatesResult(context, locations);
                     //Utils.sendNotification(context, Utils.getLocationResultTitle(context, locations));
