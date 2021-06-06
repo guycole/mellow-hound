@@ -8,14 +8,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -31,6 +29,7 @@ import android.view.WindowManager;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.File;
@@ -40,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
     public static final String LOG_TAG = MainActivity.class.getName();
 
     public static final int REQUEST_CODE = 6789;
+
+    public static final String LOCATION_INTENT_FILTER = "net.braingang.mellow_hound.LOCATION_UPDATE";
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
@@ -75,14 +76,14 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
     protected void onResume() {
         super.onResume();
         Log.i(LOG_TAG, "onResume");
-        //registerReceiver(scanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        registerReceiver(scanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         Log.i(LOG_TAG, "onPause");
-        //unregisterReceiver(scanReceiver);
+        unregisterReceiver(scanReceiver);
     }
 
     private boolean checkPermissions() {
@@ -107,8 +108,8 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
         locationRequest.setInterval(Constant.ONE_MINUTE);
         locationRequest.setFastestInterval(Constant.THIRTY_SECOND);
 
-        Intent intent = new Intent(this, LocationUpdatesBroadcastReceiver.class);
-        intent.setAction(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
+        Intent intent = new Intent(this, LocationUpdates.class);
+        intent.setAction(LocationUpdates.ACTION_PROCESS_UPDATES);
         pi = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -116,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
     }
 
     private void removeLocationUpdates() {
-
+        fusedLocationClient.removeLocationUpdates(pi);
     }
 
     @Override
@@ -129,23 +130,6 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
         } else {
             Log.i(LOG_TAG, "permissions denied");
         }
-
-        /*
-        // location manager access granted
-
-
-        //Intent intent = new Intent(this, EclecticService.class);
-        //pi = PendingIntent.getService(this, EclecticService.REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        fusedLocationClient.requestLocationUpdates(locationRequest, pi);
-
-        controlViewModel.setRunMode(getString(R.string.running));
-
-        //Intent intent = new Intent(this, LocationUpdatesBroadcastReceiver.class);
-        //intent.setAction(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
-        //return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-         */
     }
 
     @Override
@@ -167,14 +151,13 @@ public class MainActivity extends AppCompatActivity implements HoundListener, Ac
         }
 
         requestLocationUpdates();
-
         controlViewModel.setRunMode(getString(R.string.running));
     }
 
     @Override
     public void onCollectionStop() {
+        removeLocationUpdates();
         controlViewModel.setRunMode(getString(R.string.stopped));
-        fusedLocationClient.removeLocationUpdates(pi);
     }
 
     @Override

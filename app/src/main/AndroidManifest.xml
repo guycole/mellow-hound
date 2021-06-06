@@ -19,9 +19,9 @@
 
         <service android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService" android:enabled="true" />
 
-        <receiver android:name=".LocationUpdatesBroadcastReceiver" android:exported="true">
+        <receiver android:name=".LocationUpdates" android:exported="true">
             <intent-filter>
-                <action android:name="net.braingang.mellow_hound.ACTION_PROCESS_UPDATES" />
+                <action android:name="net.braingang.mellow_hound.PROCESS_UPDATES"/>
             </intent-filter>
         </receiver>
 

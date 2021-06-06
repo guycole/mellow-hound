@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import com.google.android.gms.location.LocationResult;
@@ -25,8 +26,8 @@ import java.util.List;
  *
  * https://github.com/android/location-samples/blob/432d3b72b8c058f220416958b444274ddd186abd/LocationUpdatesPendingIntent/app/src/main/java/com/google/android/gms/location/sample/locationupdatespendingintent/LocationUpdatesBroadcastReceiver.java
  */
-public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
-    public static final String LOG_TAG = LocationUpdatesBroadcastReceiver.class.getName();
+public class LocationUpdates extends BroadcastReceiver {
+    public static final String LOG_TAG = LocationUpdates.class.getName();
 
     static final String ACTION_PROCESS_UPDATES = "net.braingang.mellow_hound.PROCESS_UPDATES";
 
@@ -36,18 +37,46 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
 
         if (intent != null) {
             final String action = intent.getAction();
+            Log.i(LOG_TAG, "action:" + action);
             if (ACTION_PROCESS_UPDATES.equals(action)) {
                 LocationResult result = LocationResult.extractResult(intent);
                 if (result != null) {
                     Log.i(LOG_TAG, "intent not null");
                     List<Location> locations = result.getLocations();
-                    //Utils.setLocationUpdatesResult(context, locations);
-                    //Utils.sendNotification(context, Utils.getLocationResultTitle(context, locations));
-                    //Log.i(TAG, Utils.getLocationUpdatesResult(context));
+                    Log.i(LOG_TAG, "location size:" + locations.size());
+
+                    Personality.locationResult = LocationResult.extractResult(intent);
+
+                    WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+
+                    if (!wifiManager.isWifiEnabled()) {
+                        Log.i(LOG_TAG, "wifi disabled");
+                    } else {
+                        Log.i(LOG_TAG, "wifi enabled");
+                        wifiManager.startScan();
+                    }
                 }
             }
         } else {
             Log.i(LOG_TAG, "null intent");
         }
     }
+
+    /*
+
+        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
+        if (LocationResult.hasResult(intent)) {
+            Personality.locationResult = LocationResult.extractResult(intent);
+
+            if (!wifiManager.isWifiEnabled()) {
+                Log.i(LOG_TAG, "wifi disabled");
+            } else {
+                Log.i(LOG_TAG, "wifi enabled");
+                wifiManager.startScan();
+            }
+        } else {
+            Log.i(LOG_TAG, "location result false");
+        }
+     */
 }
