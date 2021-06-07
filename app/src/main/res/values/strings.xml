@@ -17,6 +17,8 @@
     <string name="uploading">uploading</string>
     <string name="unknown">unknown</string>
 
+    <string name="label_run_mode">Run Mode:</string>
+
     <string name="button_main_fragment">Show Main</string>
     <string name="button_list_fragment">Show List</string>
     <string name="button_start_collection">Start</string>
