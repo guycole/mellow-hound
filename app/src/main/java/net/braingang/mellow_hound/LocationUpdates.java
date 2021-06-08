@@ -35,13 +35,19 @@ public class LocationUpdates extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.i(LOG_TAG, "xxx xxx onReceive xxx xxx");
 
-        if (intent != null) {
+        if (intent == null) {
+            Log.i(LOG_TAG, "null intent");
+        } else {
+            Log.i(LOG_TAG, "not null intent");
+
             final String action = intent.getAction();
             Log.i(LOG_TAG, "action:" + action);
             if (ACTION_PROCESS_UPDATES.equals(action)) {
                 LocationResult result = LocationResult.extractResult(intent);
-                if (result != null) {
-                    Log.i(LOG_TAG, "intent not null");
+                if (result == null) {
+                    Log.i(LOG_TAG, "result null");
+                } else {
+                    Log.i(LOG_TAG, "result not null");
                     List<Location> locations = result.getLocations();
                     Log.i(LOG_TAG, "location size:" + locations.size());
 
@@ -57,26 +63,6 @@ public class LocationUpdates extends BroadcastReceiver {
                     }
                 }
             }
-        } else {
-            Log.i(LOG_TAG, "null intent");
         }
     }
-
-    /*
-
-        WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-
-        if (LocationResult.hasResult(intent)) {
-            Personality.locationResult = LocationResult.extractResult(intent);
-
-            if (!wifiManager.isWifiEnabled()) {
-                Log.i(LOG_TAG, "wifi disabled");
-            } else {
-                Log.i(LOG_TAG, "wifi enabled");
-                wifiManager.startScan();
-            }
-        } else {
-            Log.i(LOG_TAG, "location result false");
-        }
-     */
 }
