@@ -7,28 +7,19 @@
     android:layout_height="match_parent"
     tools:context=".ControlFragment">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
-
     <TextView
         android:id="@+id/tv_mode_label"
 
         android:layout_width="0dp"
         android:layout_height="wrap_content"
 
+        android:gravity="right"
         android:text="@string/label_run_mode"
         android:textSize="24sp"
 
         app:layout_constraintBottom_toTopOf="@id/button_start"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="@id/guideline"
+        app:layout_constraintEnd_toStartOf="@id/tv_mode"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -42,53 +33,75 @@
 
         app:layout_constraintBottom_toTopOf="@id/button_start"
         app:layout_constraintEnd_toEndOf="parent"
-
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintLeft_toLeftOf="@id/guideline"
-        app:layout_constraintRight_toRightOf="parent"
-
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toEndOf="@id/tv_mode_label"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button_start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_start_collection"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/button_stop"
-        app:layout_constraintTop_toBottomOf="@id/tv_mode" />
 
-    <TextView
-        android:id="@+id/tv_counter"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/unknown"
-        android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
+
+        android:text="@string/button_start_collection"
+
+        app:layout_constraintBottom_toTopOf="@id/tv_counter_label"
+        app:layout_constraintEnd_toStartOf="@id/button_stop"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/button_stop"
-        app:layout_constraintTop_toTopOf="@id/button_start" />
+        app:layout_constraintTop_toBottomOf="@id/tv_mode_label" />
 
     <Button
         android:id="@+id/button_stop"
-        android:layout_width="wrap_content"
+
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+
         android:text="@string/button_stop_collection"
+
+        app:layout_constraintBottom_toTopOf="@id/tv_counter_label"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/button_start"
+        app:layout_constraintTop_toBottomOf="@id/tv_mode_label" />
+
+    <TextView
+        android:id="@+id/tv_counter_label"
+
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        android:gravity="right"
+        android:text="@string/label_scan_file"
+        android:textSize="24sp"
+
         app:layout_constraintBottom_toTopOf="@id/button_upload"
-        app:layout_constraintTop_toBottomOf="@id/tv_counter" />
+        app:layout_constraintEnd_toStartOf="@id/tv_counter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_start" />
+
+    <TextView
+        android:id="@+id/tv_counter"
+
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        android:text="@string/unknown"
+        android:textSize="24sp"
+
+        app:layout_constraintBottom_toTopOf="@id/button_upload"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tv_counter_label"
+        app:layout_constraintTop_toBottomOf="@id/button_start" />
 
     <Button
         android:id="@+id/button_upload"
-        android:layout_width="wrap_content"
+
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+
         android:text="@string/button_upload"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/button_stop" />
+        app:layout_constraintTop_toBottomOf="@id/tv_counter_label" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
