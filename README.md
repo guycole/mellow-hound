@@ -1,4 +1,4 @@
-# mellow-hound-android
+# mellow-hound
 Mellow Hound Client (Android)
 
 Periodically collect location and information WiFi access points.
