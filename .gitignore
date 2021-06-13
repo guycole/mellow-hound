@@ -13,4 +13,4 @@
 .externalNativeBuild
 .cxx
 local.properties
-Personality.java
+app/src/main/java/net/braingang/mellow_hound/Personality.java
